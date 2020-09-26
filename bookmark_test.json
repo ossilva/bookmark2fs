@@ -1,0 +1,595 @@
+{
+   "checksum": "4fded5d921b32ad61beb68045384204c",
+   "roots": {
+      "other": {
+         "children": [ {
+            "children": [ {
+               "children": [ {
+                  "date_added": "13242760210699299",
+                  "guid": "a3327000-83d2-4d1a-89c2-e5971bb8e7e2",
+                  "id": "1908",
+                  "name": "pertelor.pdf (application/pdf Object)",
+                  "type": "url",
+                  "url": "http://www.mvtt.fi/Vesitalous/arkisto/2004/012004/pertelor.pdf"
+               }, {
+                  "date_added": "13242760210924958",
+                  "guid": "38159a2b-0789-41cb-847e-af505b18a87d",
+                  "id": "2081",
+                  "name": "Jyväskylän seudun kehittämisyhtiö Jykes Oy",
+                  "type": "url",
+                  "url": "http://www.jykes.fi/"
+               }, {
+                  "date_added": "13242760216205564",
+                  "guid": "9d33e5c9-fbb3-4118-b650-0b5415813f88",
+                  "id": "2127",
+                  "name": "www.ymparisto.fi - Vesistöjen vedenlaatu Keski-Suomessa",
+                  "type": "url",
+                  "url": "http://www.ymparisto.fi/default.asp?contentid=113454&lan=fi"
+               }, {
+                  "date_added": "13242760216371503",
+                  "guid": "96479427-9ef8-4c7f-98ef-5522dbac0c3e",
+                  "id": "2220",
+                  "name": "Lievestuoreen sellutehdas – Wikipedia",
+                  "type": "url",
+                  "url": "http://fi.wikipedia.org/wiki/Lievestuoreen_sellutehdas"
+               }, {
+                  "date_added": "13242760216452425",
+                  "guid": "64f50a1e-e03d-49ac-89da-6382efed61f5",
+                  "id": "2262",
+                  "name": "download.asp (application/pdf Object)",
+                  "type": "url",
+                  "url": "http://www.ymparisto.fi/download.asp?contentid=113585&lan=FI"
+               }, {
+                  "date_added": "13242760216585551",
+                  "guid": "09772130-6481-4efb-a2ac-73980024acf0",
+                  "id": "2331",
+                  "name": "Comenius-project",
+                  "type": "url",
+                  "url": "http://www.peda.net/en/magazine/laukaa/lievestuore/lievetuoreencomenius?m=content&a_id=90"
+               }, {
+                  "date_added": "13242760216679612",
+                  "guid": "4472f31a-90b2-40c2-bd71-79def47c71b7",
+                  "id": "2381",
+                  "name": "Keskisuomi.fi - Elinkeinot ja teollisuus",
+                  "type": "url",
+                  "url": "http://www.keskisuomi.fi/fin/suunnittelu_ja_kehittaminen/maankayton_suunnittelu/maakuntakaava/index.php?id=21"
+               }, {
+                  "date_added": "13242760216733203",
+                  "guid": "ffa63ac8-2b7b-4403-bc55-742d44d0704b",
+                  "id": "2407",
+                  "name": "Hakala.Eino-Matti.pdf (application/pdf Object)",
+                  "type": "url",
+                  "url": "https://oa.doria.fi/bitstream/handle/10024/47318/Hakala.Eino-Matti.pdf?sequence=1"
+               }, {
+                  "date_added": "13242760216828985",
+                  "guid": "61500ad4-e4b3-4a28-8468-046bb6f30345",
+                  "id": "2455",
+                  "name": "10162-Kaavaselostus_ym.pdf (application/pdf Object)",
+                  "type": "url",
+                  "url": "http://www.keskisuomi.fi/filebank/10162-Kaavaselostus_ym.pdf"
+               }, {
+                  "date_added": "13242760216884550",
+                  "guid": "a7b564c9-6dde-4846-a2ee-47daebad5c68",
+                  "id": "2487",
+                  "name": "tiivistelma.pdf (application/pdf Object)",
+                  "type": "url",
+                  "url": "http://projektit.ramboll.fi/yva/keskisuomenliitto/aineisto/tiivistelma.pdf"
+               } ],
+               "date_added": "13242760208232809",
+               "date_modified": "13242760216884550",
+               "guid": "cf1a4255-6db3-4637-9cda-c89ec6b2d884",
+               "id": "1336",
+               "name": "PBL",
+               "type": "folder"
+            }, {
+               "children": [ {
+                  "date_added": "13242760210749420",
+                  "guid": "36553463-bfae-4aaa-b85e-0fbf203ce5dc",
+                  "id": "1948",
+                  "name": "Google Image Result for http://upload.wikimedia.org/wikipedia/commons/7/73/Enol_aldol_dehydration_mechanism.png",
+                  "type": "url",
+                  "url": "http://www.google.com/imgres?um=1&safe=off&sa=N&biw=1517&bih=725&hl=en&tbm=isch&tbnid=ZzcCzf5oMI6qHM:&imgrefurl=http://commons.wikimedia.org/wiki/File:Enol_aldol_dehydration_mechanism.png&docid=uU_k-1C3bOdg5M&imgurl=http://upload.wikimedia.org/wikipedia/commons/7/73/Enol_aldol_dehydration_mechanism.png&w=1315&h=377&ei=7DWlUcHoLofg4QTttoH4Dw&zoom=1&ved=1t:3588,r:0,s:0,i:110&iact=rc&dur=1125&page=1&tbnh=98&tbnw=338&start=0&ndsp=15&tx=285&ty=33"
+               }, {
+                  "date_added": "13242760210841983",
+                  "guid": "91087af7-844d-46b9-864e-dd436d1c9da5",
+                  "id": "2018",
+                  "name": "Badge-China Badge Manufacturers & Suppliers - Made in China",
+                  "type": "url",
+                  "url": "http://www.made-in-china.com/products-search/hot-china-products/Badge.html"
+               }, {
+                  "date_added": "13242760216189285",
+                  "guid": "304d7acf-f057-4bbf-8cfc-b5532cc166f4",
+                  "id": "2119",
+                  "name": "Button Badge-Button Badge Manufacturers, Suppliers and Exporters on Alibaba.comBadges",
+                  "type": "url",
+                  "url": "http://www.alibaba.com/products/button_badge/----------------------------------Y.html"
+               }, {
+                  "date_added": "13242760216353507",
+                  "guid": "caced545-b28a-4399-804c-3f7f75b04555",
+                  "id": "2210",
+                  "name": "Knoevenagel condensation - Wikipedia, the free encyclopedia",
+                  "type": "url",
+                  "url": "http://en.wikipedia.org/wiki/Knoevenagel_condensation"
+               }, {
+                  "date_added": "13242760216482751",
+                  "guid": "b6a98a66-0b35-4c58-985f-ebb07f5b7803",
+                  "id": "2276",
+                  "name": "Knoevenagel Condensation",
+                  "type": "url",
+                  "url": "http://www.organic-chemistry.org/namedreactions/knoevenagel-condensation.shtm"
+               }, {
+                  "date_added": "13242760216543612",
+                  "guid": "a3fe276c-39bf-45bd-8fe3-ca624abcc29b",
+                  "id": "2309",
+                  "name": "SN2 reaction - Wikipedia, the free encyclopedia",
+                  "type": "url",
+                  "url": "http://en.wikipedia.org/wiki/SN2_reaction"
+               }, {
+                  "date_added": "13242760216650838",
+                  "guid": "8ce6a1f6-9fd2-46c8-b58b-33d0b3cc7001",
+                  "id": "2366",
+                  "name": "china badge factory,china commemorative coins factory,produce meda,custom medal,custom badge and so on",
+                  "type": "url",
+                  "url": "http://www.szcrafts.com/eng/index.asp"
+               }, {
+                  "date_added": "13242760216777908",
+                  "guid": "239a84b5-d957-472a-83db-1d1e76cc1c52",
+                  "id": "2429",
+                  "name": "Orgaanisen kemian Nettilabra",
+                  "type": "url",
+                  "url": "http://reagenssi.kemia.helsinki.fi/nettilabra/raportointi-ohjeet.shtml"
+               }, {
+                  "date_added": "13242760216800426",
+                  "guid": "8a10a614-9018-4bc3-8c4a-324a7889a94d",
+                  "id": "2440",
+                  "name": "Button Badge-China Button Badge Manufacturers & Suppliers - Made in China",
+                  "type": "url",
+                  "url": "http://www.made-in-china.com/products-search/hot-china-products/Button_Badge.html"
+               }, {
+                  "date_added": "13242760216862945",
+                  "guid": "a47ba52c-862f-4643-9a75-cd0e7c664e06",
+                  "id": "2475",
+                  "name": "ChemDraw: Drawing Electron Lone Pairs on Lewis Structures -- with music - YouTube",
+                  "type": "url",
+                  "url": "http://www.youtube.com/watch?v=cF_34Cv8Rz8"
+               }, {
+                  "date_added": "13242760216928471",
+                  "guid": "95515e8d-87e8-448e-b49d-916ad4724e28",
+                  "id": "2512",
+                  "name": "badge china - Google Search",
+                  "type": "url",
+                  "url": "https://www.google.com/search?q=badgematic+china&ie=utf-8&oe=utf-8&aq=t#safe=off&sclient=psy-ab&q=badge+china&oq=badge+china&gs_l=serp.3..0i10l4.14735.15891.0.15997.11.9.0.0.0.0.307.1738.0j2j4j1.7.0...0.0.0..1c.1.12.psy-ab.0ZKTbUyeiEw&pbx=1&bav=on.2,or.r_cp.r_qf.&bvm=bv.47008514,d.bGE&fp=18f7f176b27833a4&biw=1366&bih=653"
+               }, {
+                  "date_added": "13242760216983739",
+                  "guid": "e68c8e48-2596-4ca7-b623-4016efec279f",
+                  "id": "2540",
+                  "name": "Aldol condensation - Wikipedia, the free encyclopedia",
+                  "type": "url",
+                  "url": "http://en.wikipedia.org/wiki/Aldol_condensation"
+               }, {
+                  "date_added": "13242760217014803",
+                  "guid": "90cc3d2b-d5fa-43ef-95a0-b2f26d8fe21f",
+                  "id": "2558",
+                  "name": "Orgaanisen kemian Nettilabra",
+                  "type": "url",
+                  "url": "http://reagenssi.kemia.helsinki.fi/nettilabra/yleista-2.shtml"
+               }, {
+                  "date_added": "13242760217065367",
+                  "guid": "d8a9c097-09ae-4555-9603-116f7a54d747",
+                  "id": "2583",
+                  "name": "BetterFinish-Custom Lapel Pin Badges Manufacturer From China.",
+                  "type": "url",
+                  "url": "http://www.betterfinish.com.cn/"
+               }, {
+                  "date_added": "13242760217118684",
+                  "guid": "7e31b2f8-7c71-438d-8ab0-ca628e7e7ac0",
+                  "id": "2610",
+                  "name": "symmetric copy chemdraw - Google Search",
+                  "type": "url",
+                  "url": "https://www.google.com/search?q=symmetric+copy+chemdraw&ie=utf-8&oe=utf-8&aq=t"
+               }, {
+                  "date_added": "13242760217142895",
+                  "guid": "33956fc0-b7b9-4ae2-adef-f7b246d371d7",
+                  "id": "2623",
+                  "name": "Ohjelmistojakelu, Helsingin yliopisto",
+                  "type": "url",
+                  "url": "https://ohjelma.it.helsinki.fi/uuser.php?parent_id=1605&lang=fi"
+               }, {
+                  "date_added": "13242760217168952",
+                  "guid": "cc2dd5e3-3063-41d7-88bd-ade848840107",
+                  "id": "2636",
+                  "name": "The 20 most (and least) earned merit badges of 2011 « Bryan on Scouting",
+                  "type": "url",
+                  "url": "http://blog.scoutingmagazine.org/2012/01/25/the-20-most-and-least-earned-merit-badges-of-2011/"
+               }, {
+                  "date_added": "13242760217241335",
+                  "guid": "896ff534-6e72-4d86-8ca7-675acba309a2",
+                  "id": "2665",
+                  "name": "chemdraw reaction mechanisms - Google Search",
+                  "type": "url",
+                  "url": "https://www.google.com/search?q=chemdraw+reaction+mechanisms&ie=utf-8&oe=utf-8&aq=t"
+               }, {
+                  "date_added": "13242760217259299",
+                  "guid": "a7bba746-af02-4831-9275-3299030a9eac",
+                  "id": "2673",
+                  "name": "dehydration mechanism - Google Search",
+                  "type": "url",
+                  "url": "https://www.google.com/search?safe=off&q=dehydration%20mechanism&psj=1&bav=on.2,or.r_cp.r_qf.&bvm=bv.47008514,d.bGE&biw=1517&bih=725&um=1&ie=UTF-8&hl=en&tbm=isch&source=og&sa=N&tab=wi&ei=4DWlUbjDEqeF4ATdy4HYBw"
+               }, {
+                  "date_added": "13242760217311446",
+                  "guid": "b8c9c6ff-fa40-4959-abb6-c494953d4b4b",
+                  "id": "2699",
+                  "name": "Google Image Result for http://upload.wikimedia.org/wikipedia/commons/7/73/Enol_aldol_dehydration_mechanism.png",
+                  "type": "url",
+                  "url": "http://www.google.com/imgres?um=1&safe=off&sa=N&biw=1517&bih=725&hl=en&tbm=isch&tbnid=ZzcCzf5oMI6qHM:&imgrefurl=http://commons.wikimedia.org/wiki/File:Enol_aldol_dehydration_mechanism.png&docid=uU_k-1C3bOdg5M&imgurl=http://upload.wikimedia.org/wikipedia/commons/7/73/Enol_aldol_dehydration_mechanism.png&w=1315&h=377&ei=7DWlUcHoLofg4QTttoH4Dw&zoom=1&ved=1t:3588,r:0,s:0,i:110&iact=rc&dur=1125&page=1&tbnh=98&tbnw=338&start=0&ndsp=15&tx=285&ty=33"
+               }, {
+                  "date_added": "13242760217339331",
+                  "guid": "23b8b059-a255-4136-a768-6ec950a99c17",
+                  "id": "2710",
+                  "name": "Ohjelmistojakelu, Helsingin yliopisto",
+                  "type": "url",
+                  "url": "https://ohjelma.it.helsinki.fi/download/osilva@helsinki.fi/"
+               }, {
+                  "date_added": "13242760217388762",
+                  "guid": "3d1563c9-6f3f-42c7-ab8e-3c90c67e1905",
+                  "id": "2735",
+                  "name": "resonance chembiodraw - Google Search",
+                  "type": "url",
+                  "url": "https://www.google.com/search?q=resonance+chembiodraw&ie=utf-8&oe=utf-8&aq=t"
+               }, {
+                  "date_added": "13242760217419211",
+                  "guid": "a2cfbb5f-4777-4421-919e-e8e51d627ff8",
+                  "id": "2748",
+                  "name": "reagenssi.kemia.helsinki.fi/nettilabra/tiedostot/Raportointi pt II ja syv.pdf",
+                  "type": "url",
+                  "url": "http://reagenssi.kemia.helsinki.fi/nettilabra/tiedostot/Raportointi%20pt%20II%20ja%20syv.pdf"
+               }, {
+                  "date_added": "13242760217461558",
+                  "guid": "64c393bc-76cb-4170-b2d3-2cec47a73ab0",
+                  "id": "2766",
+                  "name": "Badge, Badge Products, Badge Suppliers and Manufacturers at Alibaba.com",
+                  "type": "url",
+                  "url": "http://www.alibaba.com/showroom/badge.html"
+               }, {
+                  "date_added": "13242760217479260",
+                  "guid": "071167eb-15b3-47dc-a6bf-9c4a2487d74d",
+                  "id": "2773",
+                  "name": "Orgaanisen kemian Nettilabra",
+                  "type": "url",
+                  "url": "http://reagenssi.kemia.helsinki.fi/nettilabra/tyot-2-sorbic_acid.shtml"
+               }, {
+                  "date_added": "13242760217510961",
+                  "guid": "2b76cae9-4c33-4b6f-bcbf-451905e05ca3",
+                  "id": "2787",
+                  "name": "reagenssi.kemia.helsinki.fi/nettilabra/tiedostot/synteesikaavake_uusi.pdf",
+                  "type": "url",
+                  "url": "http://reagenssi.kemia.helsinki.fi/nettilabra/tiedostot/synteesikaavake_uusi.pdf"
+               }, {
+                  "date_added": "13242760217538539",
+                  "guid": "6931d14a-8135-45b2-830c-218c3b5c01cb",
+                  "id": "2799",
+                  "name": "The Verley-Doebner modification of the Knoevenagel reaction.? - Yahoo! Answers",
+                  "type": "url",
+                  "url": "http://answers.yahoo.com/question/index?qid=20070121211823AA7OFWD"
+               }, {
+                  "date_added": "13242760217566491",
+                  "guid": "f5751723-49a5-41c7-b32f-3c2acb059de8",
+                  "id": "2812",
+                  "name": "Orgaanisen kemian Nettilabra",
+                  "type": "url",
+                  "url": "http://reagenssi.kemia.helsinki.fi/nettilabra/tyot-2.shtml"
+               }, {
+                  "date_added": "13242760217591732",
+                  "guid": "a23ac691-c704-4639-ad5a-97736e2ab544",
+                  "id": "2825",
+                  "name": "www.chem.umass.edu/~samal/267/chemdraw.pdf",
+                  "type": "url",
+                  "url": "http://www.chem.umass.edu/~samal/267/chemdraw.pdf"
+               } ],
+               "date_added": "13242760208696842",
+               "date_modified": "13242760217591732",
+               "guid": "3a52aae1-b91c-427e-adc2-aa188cba6f2d",
+               "id": "1402",
+               "name": "org22",
+               "type": "folder"
+            }, {
+               "children": [ {
+                  "date_added": "13242760210721845",
+                  "guid": "38d4e277-6223-4781-a253-020fb6643195",
+                  "id": "1927",
+                  "name": "Rayleigh and Mie Light Scattering.pdf",
+                  "type": "url",
+                  "url": "http://plaza.ufl.edu/dwhahn/Rayleigh%20and%20Mie%20Light%20Scattering.pdf"
+               } ],
+               "date_added": "13242760208749967",
+               "date_modified": "13242760210721845",
+               "guid": "4ba201ce-70f6-4cea-819f-1dee6bcbf549",
+               "id": "1441",
+               "name": "pchemPrac",
+               "type": "folder"
+            }, {
+               "children": [ {
+                  "date_added": "13242760210689490",
+                  "guid": "e067af8f-a241-4c20-8a94-1cd3accae6f4",
+                  "id": "1900",
+                  "name": "KL, Fysikaalinen kemia » \u003CH3>Cum laude-harjoitustöiden työohjeita\u003C/H3>",
+                  "type": "url",
+                  "url": "https://alma.helsinki.fi/doclink/75433"
+               }, {
+                  "date_added": "13242760210936165",
+                  "guid": "bcb134ab-be29-47ee-be9b-a971ff9f38d1",
+                  "id": "2089",
+                  "name": "Työt - FyskemlabTD (Created by vhannine@helsinki.fi 09032009) - University of Helsinki Confluence",
+                  "type": "url",
+                  "url": "https://wiki.helsinki.fi/pages/viewpage.action?pageId=45580631"
+               } ],
+               "date_added": "13242760208789282",
+               "date_modified": "13242760210936165",
+               "guid": "87e69667-eb0e-4b66-a98d-3f11f3ce780b",
+               "id": "1473",
+               "name": "fysHarjTyot",
+               "type": "folder"
+            }, {
+               "children": [ {
+                  "children": [ {
+                     "children": [ {
+                        "date_added": "13242760220382283",
+                        "guid": "c3910d7c-70e3-46ab-af60-932055efc3bf",
+                        "id": "3839",
+                        "name": "SpartanStudentV6Tutorials.pdf",
+                        "type": "url",
+                        "url": "http://downloads.wavefun.com/SpartanStudentV6Tutorials.pdf"
+                     }, {
+                        "date_added": "13242760220403737",
+                        "guid": "a5e9fca6-3545-46ec-a33e-f18071784f47",
+                        "id": "3852",
+                        "name": "AIST:Spectral Database for Organic Compounds,SDBS",
+                        "type": "url",
+                        "url": "http://sdbs.db.aist.go.jp/sdbs/cgi-bin/direct_frame_top.cgi"
+                     }, {
+                        "date_added": "13242760220417469",
+                        "guid": "24ccae11-4e1a-41c8-b7d5-1f644d31aee2",
+                        "id": "3860",
+                        "name": "cas ethenol - Google Search",
+                        "type": "url",
+                        "url": "https://www.google.fi/search?num=30&q=cas+ethenol&nfpr=1&sa=X&ved=0ahUKEwjKq6L13oXZAhWChSwKHa-CBooQvgUIJigB&biw=853&bih=691"
+                     }, {
+                        "date_added": "13242760220428848",
+                        "guid": "baee02f2-2d04-4689-87df-85bf0bc83c5b",
+                        "id": "3866",
+                        "name": "The Org Manual: Tables in LaTeX export",
+                        "type": "url",
+                        "url": "https://orgmode.org/manual/Tables-in-LaTeX-export.html"
+                     }, {
+                        "date_added": "13242760220456944",
+                        "guid": "f4f978b5-52df-4cbd-876e-112028dd7f9e",
+                        "id": "3881",
+                        "name": "INFRARED SPECTROSCOPY (IR)",
+                        "type": "url",
+                        "url": "https://www.utdallas.edu/~scortes/ochem/OChem_Lab1/recit_notes/ir_presentation.pdf"
+                     } ],
+                     "date_added": "13242760219918987",
+                     "date_modified": "13242760220456944",
+                     "guid": "1d1a2407-46ca-4d44-93a3-11f04f9054ce",
+                     "id": "3581",
+                     "name": "New folder",
+                     "type": "folder"
+                  } ],
+                  "date_added": "13242760210833818",
+                  "date_modified": "13242760219919513",
+                  "guid": "9085f296-1d54-4846-9812-1cea912813a6",
+                  "id": "2011",
+                  "name": "A4",
+                  "type": "folder"
+               }, {
+                  "children": [ {
+                     "children": [ {
+                        "date_added": "13242760220377022",
+                        "guid": "a5e6f08d-d7ed-48d2-be40-e429ab2b655f",
+                        "id": "3836",
+                        "name": "Hydrogen spectral series - Wikipedia",
+                        "type": "url",
+                        "url": "https://en.wikipedia.org/wiki/Hydrogen_spectral_series"
+                     }, {
+                        "date_added": "13242760220408288",
+                        "guid": "b954a9d3-4594-4a0f-919e-9cc01bd9c72d",
+                        "id": "3855",
+                        "name": "latex converter - Google Search",
+                        "type": "url",
+                        "url": "https://www.google.com/search?q=latex+converter&oq=latex+converter&aqs=chrome..69i57j0l5.2416j0j7&sourceid=chrome&ie=UTF-8"
+                     }, {
+                        "date_added": "13242760220423220",
+                        "guid": "4268dbc7-214c-4e01-a2f0-7bf85c5c75e9",
+                        "id": "3863",
+                        "name": "Rydberg formula - Wikipedia",
+                        "type": "url",
+                        "url": "https://en.wikipedia.org/wiki/Rydberg_formula"
+                     }, {
+                        "date_added": "13242760220442369",
+                        "guid": "c30c32be-2026-4dab-a939-3d6626d0b427",
+                        "id": "3873",
+                        "name": "ranger - ArchWiki",
+                        "type": "url",
+                        "url": "https://wiki.archlinux.org/index.php/ranger"
+                     }, {
+                        "date_added": "13242760220449610",
+                        "guid": "3209bf05-2916-4271-bf19-adef0e0d4c67",
+                        "id": "3877",
+                        "name": "1.0973731569 - Google Search",
+                        "type": "url",
+                        "url": "https://www.google.com/search?q=1.0973731569&oq=1.0973731569&aqs=chrome..69i57.160j0j7&sourceid=chrome&ie=UTF-8"
+                     }, {
+                        "date_added": "13242760220460672",
+                        "guid": "e6ce7ec5-6176-45bc-8629-1db6a967365c",
+                        "id": "3883",
+                        "name": "1.096776×10^7 reciprocal meters - Wolfram|Alpha",
+                        "type": "url",
+                        "url": "http://www.wolframalpha.com/input/?i=1.096776%C3%9710%5E7+reciprocal+meters&lk=1&rawformassumption=%22ClashPrefs%22+-%3E+%22ClashPrefs%22"
+                     }, {
+                        "date_added": "13242760220474894",
+                        "guid": "838230e1-edb2-4d58-999e-6e57617ef822",
+                        "id": "3889",
+                        "name": "Rydberg constant | physics | Britannica.com",
+                        "type": "url",
+                        "url": "https://www.britannica.com/science/Rydberg-constant"
+                     }, {
+                        "date_added": "13242760251302980",
+                        "guid": "e5411e5b-da16-4b99-96e6-89b37bc172c5",
+                        "id": "3898",
+                        "name": "CODATA Value: atomic mass unit-kilogram relationship",
+                        "type": "url",
+                        "url": "https://physics.nist.gov/cgi-bin/cuu/Value?ukg"
+                     }, {
+                        "date_added": "13242760251322387",
+                        "guid": "a1d5cb32-770d-4aa0-9370-e949493c0d1f",
+                        "id": "3905",
+                        "name": "siunitx — A comprehensive (SI) units package",
+                        "type": "url",
+                        "url": "ftp://ftp.dante.de/tex-archive/macros/latex/exptl/siunitx/siunitx.pdf"
+                     }, {
+                        "date_added": "13242760251333767",
+                        "guid": "efc53b29-3cb8-4eb3-813d-ed9c54d26d5d",
+                        "id": "3911",
+                        "name": "NIST ASD Output: Lines",
+                        "type": "url",
+                        "url": "https://physics.nist.gov/cgi-bin/ASD/lines1.pl?spectra=hg+I&limits_type=0&low_w=200&upp_w=650&unit=1&de=0&format=0&line_out=0&en_unit=0&output=0&bibrefs=1&page_size=15&show_obs_wl=1&show_calc_wl=1&unc_out=1&order_out=0&max_low_enrg=&show_av=2&max_upp_enrg=&tsb_value=0&min_str=2.0e%2B07&A_out=0&intens_out=on&max_str=&allowed_out=1&forbid_out=1&min_accur=&min_intens=&conf_out=on&term_out=on&enrg_out=on&J_out=on&submit=Retrieve+Data"
+                     }, {
+                        "date_added": "13242760251341024",
+                        "guid": "018c2119-d44e-42fe-b210-5b478b37e8a7",
+                        "id": "3913",
+                        "name": "Mercury-vapor lamp - Wikipedia",
+                        "type": "url",
+                        "url": "https://en.wikipedia.org/wiki/Mercury-vapor_lamp"
+                     }, {
+                        "date_added": "13242760251354505",
+                        "guid": "5520c987-3001-4e5f-ac3e-55f483412eef",
+                        "id": "3920",
+                        "name": "argon emission spectrum - Google Search",
+                        "type": "url",
+                        "url": "https://www.google.fi/search?q=argon+emission+spectrum&num=30&source=lnms&tbm=isch&sa=X&ved=0ahUKEwiy8qDg57TZAhWK-qQKHVUvCagQ_AUICigB&biw=853&bih=860#imgrc=aqB1TJQwpdYvCM:"
+                     }, {
+                        "date_added": "13242760251375308",
+                        "guid": "a411d071-19b5-4479-b7c7-bfd6c1b7d463",
+                        "id": "3930",
+                        "name": "Microsoft Word - II_6_Rydberg.doc",
+                        "type": "url",
+                        "url": "http://www.physics.pub.ro/Referate/FILS_Engleza/BN031A_ENGLEZA/II_6_Rydberg.pdf"
+                     }, {
+                        "date_added": "13242760251389382",
+                        "guid": "08285f68-16e5-4b32-975d-142cce98efaa",
+                        "id": "3935",
+                        "name": "Rydberg constant - Wikipedia",
+                        "type": "url",
+                        "url": "https://en.wikipedia.org/wiki/Rydberg_constant"
+                     } ],
+                     "date_added": "13242760219920502",
+                     "date_modified": "13242760251389382",
+                     "guid": "e61d2931-1d39-4eef-81bf-a905da1c4acb",
+                     "id": "3582",
+                     "name": "New folder",
+                     "type": "folder"
+                  }, {
+                     "date_added": "13242760219945338",
+                     "guid": "281e0382-85d6-4a28-9808-153b22b8ceea",
+                     "id": "3595",
+                     "name": "HG-1 Calibration Source - Ocean Optics",
+                     "type": "url",
+                     "url": "https://oceanoptics.com/product/hg-1/"
+                  } ],
+                  "date_added": "13242760210963282",
+                  "date_modified": "13242760219945338",
+                  "guid": "c59cb54d-53fd-40d2-a3ea-f474babfa654",
+                  "id": "2102",
+                  "name": "A1",
+                  "type": "folder"
+               }, {
+                  "children": [ {
+                     "date_added": "13242760219880571",
+                     "guid": "0913bc20-ec6b-43f0-9443-7589d9b76ab2",
+                     "id": "3559",
+                     "name": "Robust linear model estimation using RANSAC — scikit-learn 0.19.1 documentation",
+                     "type": "url",
+                     "url": "http://scikit-learn.org/stable/auto_examples/linear_model/plot_ransac.html"
+                  } ],
+                  "date_added": "13242760216300683",
+                  "date_modified": "13242760219880571",
+                  "guid": "e9c57085-6a85-4d66-bca1-953b8de0a264",
+                  "id": "2181",
+                  "name": "A2",
+                  "type": "folder"
+               } ],
+               "date_added": "13242760208826983",
+               "date_modified": "13242760216301198",
+               "guid": "91136298-f634-4fd7-89a1-8bbad28451e3",
+               "id": "1500",
+               "name": "FysLabrat",
+               "type": "folder"
+            }, {
+               "date_added": "13242760208834279",
+               "guid": "59a6eb44-a486-4ba9-bf5c-27e82b24f86a",
+               "id": "1505",
+               "name": "courses.chem.psu.edu/chem36/Experiments/PDF's_for_techniques/Liquid_Liquid.pdf",
+               "type": "url",
+               "url": "http://courses.chem.psu.edu/chem36/Experiments/PDF%27s_for_techniques/Liquid_Liquid.pdf"
+            }, {
+               "date_added": "13242760208863414",
+               "guid": "f6891212-8530-4e6e-89a5-7227615450ee",
+               "id": "1530",
+               "name": "Nuclear Magnetic Resonance Spectroscopy Page",
+               "type": "url",
+               "url": "http://www.chemistry.ccsu.edu/glagovich/teaching/316/nmr/nmr.html"
+            }, {
+               "date_added": "13242760208902174",
+               "guid": "3b1fdb7a-6009-48f1-bf26-56f95a9d5f62",
+               "id": "1559",
+               "name": "www.chem.ucla.edu/harding/30C/30C_w03/NMRsupp.pdf",
+               "type": "url",
+               "url": "http://www.chem.ucla.edu/harding/30C/30C_w03/NMRsupp.pdf"
+            }, {
+               "date_added": "13242760210125080",
+               "guid": "90a3885d-6a49-4400-bfaf-63f8607f90a1",
+               "id": "1576",
+               "name": "1H NMR - Integration",
+               "type": "url",
+               "url": "http://users.wfu.edu/ylwong/chem/nmr/h1/integration.html?q2a=3&q2b=2&Submit=Check"
+            }, {
+               "date_added": "13242760210135509",
+               "guid": "65a782e1-dda2-487b-80e6-52fc5c322e31",
+               "id": "1583",
+               "name": "Fysikaalisen kemian perustyöt A - FysKemLab - University of Helsinki Confluence",
+               "type": "url",
+               "url": "https://wiki.helsinki.fi/pages/viewpage.action?pageId=34637646"
+            }, {
+               "date_added": "13242760210155260",
+               "guid": "011f3ece-d0f1-4d79-add0-c6acce8d1d61",
+               "id": "1596",
+               "name": "ibm rxn ai prediction",
+               "type": "url",
+               "url": "https://www.ibm.com/blogs/research/2018/08/neural-networks-organic-chemistry/"
+            } ],
+            "date_added": "13242760193288296",
+            "date_modified": "13242760210155260",
+            "guid": "f9b198e3-8ea2-4206-a0dd-5a702bd4d97b",
+            "id": "6",
+            "name": "CHEM",
+            "type": "folder"
+         } ],
+         "date_added": "13242072815612221",
+         "date_modified": "13242760193292479",
+         "guid": "00000000-0000-4000-a000-000000000003",
+         "id": "2",
+         "name": "Other bookmarks",
+         "type": "folder"
+      },
+      "synced": {
+         "children": [  ],
+         "date_added": "13242072815612252",
+         "date_modified": "0",
+         "guid": "00000000-0000-4000-a000-000000000004",
+         "id": "3",
+         "name": "Mobile bookmarks",
+         "type": "folder"
+      }
+   },
+   "version": 1
+}
