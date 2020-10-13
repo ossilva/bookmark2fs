@@ -1,0 +1,33 @@
+{{ define "main" }}
+  <!DOCTYPE NETSCAPE-Bookmark-file-1>
+  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+  <title>Bookmarks</title>
+  <h1>Bookmarks</h1>
+  <dl><p>
+  <dl>
+  {{- range $key, $value := .Roots -}}
+    <dt><h3 ADD_DATE="{{$value.DateCreated}}" LAST_MODIFIED="{{$value.DateModified}}" 
+    {{- if eq $key "Bookmarks bar" -}}PERSONAL_TOOLBAR_FOLDER="true"{{- end -}}
+    >{{$value.Name}}</h3>
+    <dl><p>
+      {{ template "fileTree" $value.Children }}
+    </dl><p>
+  {{- end -}}
+  </dl>
+{{- end -}}
+
+{{- define "fileTree" -}}
+  {{- if . -}}
+    {{ range . }}
+      {{- if eq .Type "folder" -}}
+        <dt><h3 ADD_DATE="{{.DateCreated}}" LAST_MODIFIED="{{.DateModified}}">{{.Name}}</h3>
+        <dl><p>
+          {{ template "fileTree" .Children }}
+        </dl><p>
+      {{ end }}
+      {{- if eq .Type "url" -}}
+        <dt><a href="{{.URL}}" ADD_DATE="{{.DateCreated}}">{{.Name}}</a>
+      {{ end }}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}

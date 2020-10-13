@@ -1,3 +1,4 @@
+// https://gist.github.com/lummie/7f5c237a17853c031a57277371528e87
 package main
 
 import (
