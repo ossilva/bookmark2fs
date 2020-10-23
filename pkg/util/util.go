@@ -1,4 +1,4 @@
-package main
+package util
 
 import (
 	"runtime"
@@ -62,7 +62,8 @@ var fn2sMSMap = map[rune]rune{
 	'⋅': '.',
 }
 
-func stringToFilename(s string) string {
+//StringToFilename convert original bookmark name to os path
+func StringToFilename(s string) string {
 	osName := runtime.GOOS
 	switch osName {
 	case "windows":
@@ -71,7 +72,9 @@ func stringToFilename(s string) string {
 		return strings.Map(s2fn, s)
 	}
 }
-func filenameToString(s string) string {
+
+//FilenameToString convert os path to original bookmark name
+func FilenameToString(s string) string {
 	osName := runtime.GOOS
 	switch osName {
 	case "windows":
@@ -79,4 +82,10 @@ func filenameToString(s string) string {
 	default:
 		return strings.Map(fn2s, s)
 	}
+}
+
+//BookmarkTracker is a simple wrapper for tracking input and output bookmarks
+type BookmarkTracker struct {
+	In  map[string]string
+	Out map[string]string
 }
