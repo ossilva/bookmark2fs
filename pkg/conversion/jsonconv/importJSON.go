@@ -1,4 +1,4 @@
-package conversion
+package jsonconv
 
 import (
 	"encoding/json"

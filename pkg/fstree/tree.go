@@ -24,42 +24,99 @@ func check(e error) {
 	}
 }
 
+func getUniqFilename(filepath string) string {
+	var tryPath = filepath
+	count := 1
+	dedupPath := func() {
+		tryPath = fmt.Sprintf("%s%s", filepath, strings.Repeat("^", count))
+		count++
+	}
+
+	for {
+		info, err := os.Stat(tryPath)
+		if err != nil {
+			if os.IsNotExist(err) {
+				break
+			} else {
+				panic(err)
+			}
+		} else if info.IsDir() {
+			dedupPath()
+		} else if !info.IsDir() {
+			dedupPath()
+		}
+	}
+	return tryPath
+}
+
+func mkFileTreeDir(tmpRoot string) string {
+	if tmpRoot == "" {
+		programName := "bookmark2fs"
+		tmpDirPath, err := ioutil.TempDir(os.TempDir(), programName)
+		check(err)
+		return tmpDirPath
+	}
+
+	_, err := os.Stat(tmpRoot)
+	if os.IsNotExist(err) {
+		mkdirErr := os.MkdirAll(tmpRoot, 0755)
+		check(mkdirErr)
+		return tmpRoot
+	}
+
+	if err == nil {
+		return tmpRoot
+	}
+
+	panic("Given temporary directory path already exists")
+
+}
+
 //PopulateTmpDir reflects abstract trees to the filesystem as files and dirs
-func PopulateTmpDir(baseDirs map[string]*base.BookmarkNodeBase, tracker util.BookmarkTracker) (string, map[string]string) {
-	programName := "bookmark2fs"
-	tmpDirPath, err := ioutil.TempDir(os.TempDir(), programName)
-	check(err)
+func PopulateTmpDir(
+	baseDirs map[string]*base.BookmarkNodeBase,
+	tracker *util.BookmarkTracker,
+	tmpRoot string,
+) (string, map[string]string) {
+	tmpDirPath := mkFileTreeDir(tmpRoot)
 
 	populateRootDir := func(rootNode *base.BookmarkNodeBase) string {
 		stack := []*base.BookmarkNodeBase{rootNode}
 		filename := util.StringToFilename(rootNode.Name)
 		rootNode.Path = path.Join(tmpDirPath, filename)
-		bmIndex := rootNode.Name + rootNode.URL
-		tracker.In[bmIndex] = rootNode.Path
 		for len(stack) > 0 {
 			fileNode := stack[len(stack)-1]
 			nodePath := fileNode.Path
+
+			bmIndex := fileNode.Name + fileNode.URL
+			tracker.In[bmIndex] = fileNode.Path
+
 			stack = stack[:len(stack)-1]
 
-			// initialBMMap[rootNode.Name+rootNode.URL] = rootNode.Path
+			uniqFileName := getUniqFilename(fileNode.Path)
 
 			switch fileNode.Type {
 			case "url":
-				d := []byte(fileNode.URL + "\n")
+				contents := []byte(fileNode.URL + "\n" + fileNode.Name + "\n")
 
-				err := ioutil.WriteFile(fileNode.Path, d, 0644)
+				err := ioutil.WriteFile(uniqFileName, contents, 0644)
 				check(err)
 				// set file times according to date added
 				ctime := time.Unix(fileNode.DateCreated, 0)
-				atime := time.Unix(fileNode.DateModified, 0)
-				err = os.Chtimes(fileNode.Path, atime, ctime)
+				err = os.Chtimes(fileNode.Path, ctime, ctime)
 				check(err)
 
 			case "folder":
-				err := os.Mkdir(nodePath, 0755)
+
+				mkdirErr := os.Mkdir(uniqFileName, 0755)
+				check(mkdirErr)
+				folderNamePath := uniqFileName + "/~FOLDERNAME"
+				err := ioutil.WriteFile(folderNamePath, []byte(fileNode.Path+"\n"), 0644)
 				check(err)
 
-				// defer os.RemoveAll(nodePath)
+				ctime := time.Unix(fileNode.DateCreated, 0)
+				atime := time.Unix(fileNode.DateModified, 0)
+				err = os.Chtimes(fileNode.Path, atime, ctime)
 
 				for _, child := range fileNode.Children {
 					childFName := util.StringToFilename(child.Name)
@@ -86,13 +143,24 @@ func PopulateTmpDir(baseDirs map[string]*base.BookmarkNodeBase, tracker util.Boo
 }
 
 //ConstructFSTree construct file trees according to
-func ConstructFSTree(path string, tracker util.BookmarkTracker) *base.BookmarkNodeBase {
+func ConstructFSTree(path string, tracker *util.BookmarkTracker) *base.BookmarkNodeBase {
 
 	// currently only handles URL
 	toFileObj := func(file os.FileInfo, t times.Timespec, path string) *base.BookmarkNodeBase {
-		URL := ""
-		nodeType := "folder"
-		if !file.IsDir() {
+		var nodeType, URL, Name string
+		if file.IsDir() {
+			nodeType = "folder" // TODO could use enums here instead
+
+			folderName, err := ioutil.ReadFile(path + "/~FOLDERNAME")
+			check(err)
+
+			contents := strings.SplitN(string(folderName), "\n", -1)
+			//only first line contains non-whitespace chars
+			if len(contents) > 2 || contents[1] != "" {
+				fmt.Println("Warning, helper file ~FOLDERNAME should only contain 1 line")
+			}
+			Name = contents[0]
+		} else if !file.IsDir() && file.Name() != "~FOLDERNAME" {
 			nodeType = "url" // TODO could use enums here instead
 
 			// fmt.Println(path)
@@ -101,26 +169,31 @@ func ConstructFSTree(path string, tracker util.BookmarkTracker) *base.BookmarkNo
 
 			contents := strings.SplitN(string(content), "\n", -1)
 			//only first line contains non-whitespace chars
-			if len(contents) > 2 || contents[1] != "" {
-				fmt.Println("Warning, only first line containing URL in file '" + path + "' was parsed.")
+			if len(contents) < 3 {
+				panic("Error, bookmark file did not contain lines for URL and name")
+			}
+			if len(contents) > 3 || contents[2] != "" {
+				fmt.Println("Warning, only first two lines containing URL and name in file '" + path + "' were parsed.")
 			}
 			URL = contents[0]
+			Name = contents[1]
 		}
-		JSONFile := base.BookmarkNodeBase{
+
+		node := base.BookmarkNodeBase{
 			DateModified: int64(t.AccessTime().Unix()),
 			DateCreated:  int64(t.ModTime().Unix()),
 			Type:         nodeType,
-			Name:         util.FilenameToString(file.Name()),
+			Name:         Name,
 			URL:          URL,
 			Path:         path,
 			Children:     []*base.BookmarkNodeBase{},
 		}
-		tracker.Out[JSONFile.Name+URL] = path
+		tracker.Out[node.Name+URL] = path
 		// if file.Mode()&os.ModeSymlink == os.ModeSymlink {
 		// 	// JSONFile.IsLink = true
 		// 	JSONFile.LinksTo, _ = filepath.EvalSymlinks(filepath.Join(path, file.Name()))
 		// } // Else case is the zero values of the fields
-		return &JSONFile
+		return &node
 	}
 	rootOSFile, _ := os.Stat(path)
 	t, err := times.Stat(path)
@@ -145,4 +218,13 @@ func ConstructFSTree(path string, tracker util.BookmarkTracker) *base.BookmarkNo
 	return rootFile
 	// output, _ := json.MarshalIndent(rootFile, "", "     ")
 	// fmt.Println(string(output))
+}
+
+//CollectFSTrees construct trees for root map
+func CollectFSTrees(tmpRootPathMap map[string]string, tracker *util.BookmarkTracker) map[string]*base.BookmarkNodeBase {
+	var exportRoots = map[string]*base.BookmarkNodeBase{}
+	for k, v := range tmpRootPathMap {
+		exportRoots[k] = ConstructFSTree(v, tracker)
+	}
+	return exportRoots
 }

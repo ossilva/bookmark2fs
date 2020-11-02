@@ -7,7 +7,7 @@
   <dl>
   {{- range $key, $value := . -}}
     <dt><h3 ADD_DATE="{{$value.DateCreated}}" LAST_MODIFIED="{{$value.DateModified}}" 
-    {{- if eq $key "Bookmarks bar" -}}PERSONAL_TOOLBAR_FOLDER="true"{{- end -}}
+    {{- if $value.BookmarkBar -}} PERSONAL_TOOLBAR_FOLDER="true"{{- end -}}
     >{{$value.Name}}</h3>
     <dl><p>
       {{- template "fileTree" $value.Children -}}

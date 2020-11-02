@@ -5,19 +5,44 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/signal"
 	"path"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/spf13/cobra"
 
-	"github.com/ossilva/bookmark2fs/pkg/conversion"
+	"github.com/ossilva/bookmark2fs/pkg/configuration"
 	"github.com/ossilva/bookmark2fs/pkg/conversion/base"
-	"github.com/ossilva/bookmark2fs/pkg/fstree"
+	"github.com/ossilva/bookmark2fs/pkg/conversion/htmlconv"
+	"github.com/ossilva/bookmark2fs/pkg/conversion/jsonconv"
+	"github.com/ossilva/bookmark2fs/pkg/prompt"
 	"github.com/ossilva/bookmark2fs/pkg/util"
 )
+
+func makeConfig() *configuration.Bm2fsConfig {
+
+	timeString := time.Now().Format("02_01_06")
+	defaultFileName := fmt.Sprintf("BM2FS_bookmarks_%s.html",
+		timeString,
+	)
+	wd, err := os.Getwd()
+	check(err)
+	outFile := wd + "/" + defaultFileName
+	var configDir, _ = os.UserConfigDir()
+	configDir += "bookmark.sqlite"
+	tmpDir, err := getFreeTmpDir()
+	check(err)
+	var config = &configuration.Bm2fsConfig{
+		TmpRoot:    tmpDir,
+		UserDB:     configDir,
+		OutputFile: outFile,
+	}
+	return config
+}
 
 func fileExists(filename string) bool {
 	info, err := os.Stat(filename)
@@ -29,47 +54,55 @@ func fileExists(filename string) bool {
 
 var (
 	//for flags
-	inFile   string
-	outFile  string
-	quietp   bool
-	convertp bool
-	tracker  util.BookmarkTracker
+	inFile       string
+	outFile      string
+	quietp       bool
+	convertp     bool
+	interactivep bool
+	tracker      *util.BookmarkTracker
 
 	rootCmd = &cobra.Command{
 		Use:   "bookmark2fs [bookmark file]",
-		Short: "Bookmark2fs manages bookmarks as files and returns browser-readable html ",
-		Long: `A tool for converting JSON/html bookmarks and simple file trees. Exporting
-		to browser-compatible bookmark html`,
+		Short: "Bookmark2fs reads bookmark files as file trees and returns browser-readable html ",
+		Long: `A tool for reading JSON/html bookmarks and converting them into simple file trees. Exports
+		file trees to browser-compatible bookmark html`,
 		Run: run,
 	}
 )
 
 func run(cmd *cobra.Command, args []string) {
-	var tracker = util.BookmarkTracker{}
+	config := makeConfig()
+	SetupCloseHandler(config)
+
+	if inFile == "" {
+		inFile = args[0]
+	}
 	reader, err := os.Open(inFile)
 	check(err)
 	if inFile == "Bookmarks" {
-		conversion.DecodeJSON(reader)
+		jsonconv.DecodeJSON(reader)
 	}
 
 	var bookmarkRoots map[string]*base.BookmarkNodeBase
 	switch filepath.Ext(inFile) {
-	case "json":
-		bookmarkRoots = conversion.DecodeJSON(reader)
-	case "html":
-		bookmarkRoots = conversion.ParseNetscapeHTML(reader)
+	case ".json":
+		bookmarkRoots = jsonconv.DecodeJSON(reader)
+	case ".html":
+		bookmarkRoots = htmlconv.ParseNetscapeHTML(reader)
+	default:
+		panic("unrecognized file extension")
 	}
 
-	tmpDirPath, tmpRootPathMap := fstree.PopulateTmpDir(bookmarkRoots, tracker)
-
-	var exportRoots = map[string]*base.BookmarkNodeBase{}
-	for k, v := range tmpRootPathMap {
-		exportRoots[k] = fstree.ConstructFSTree(v, tracker)
+	if convertp {
+		htmlconv.BuildTreeHTML(bookmarkRoots, config.OutputFile)
+		return
 	}
-	conversion.BuildTreeHTML(exportRoots, outFile)
+	if interactivep {
+		prompt.Init(config, bookmarkRoots, tracker)
+		return
+	}
+	// displayCLI()
 
-	// readUserInput()
-	defer os.RemoveAll(tmpDirPath)
 }
 
 func check(e error) {
@@ -120,13 +153,13 @@ func readUserInput() {
 func parseArgs(args []string) string {
 	now := time.Now()
 	timeString := now.Format("02_01_06")
-	yearDecade := fmt.Sprintf("BM2FS_bookmarks_%s.html",
+	defaultFileName := fmt.Sprintf("BM2FS_bookmarks_%s.html",
 		timeString,
 	)
 	candidatesInFile := []string{
 		inFile,
 		args[len(args)],
-		yearDecade,
+		defaultFileName,
 	}
 
 	var outname string
@@ -147,19 +180,31 @@ func Execute() error {
 
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&inFile, "in", "i", "", "input file to parsed of type 'HTML' or 'JSON'")
-	// rootCmd.PersistentFlags().StringVarP(&outFile, "out", "o", "", "filename to write html to")
+	rootCmd.PersistentFlags().StringVarP(&outFile, "out", "o", "stdout", "filename to write html to")
 	rootCmd.PersistentFlags().BoolVarP(&quietp, "quiet", "q", false, "don't print anything to stdout")
 	rootCmd.PersistentFlags().BoolVarP(&convertp, "convert", "c", false, "only perform conversion JSON -> HTML")
+	rootCmd.PersistentFlags().BoolVarP(&interactivep, "prompt", "p", false, "prompt user for commands")
+	tracker = util.NewTracker()
+}
 
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
-	// rootCmd.PersistentFlags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
-	// rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "name of license for the project")
-	// rootCmd.PersistentFlags().Bool("viper", true, "use Viper for configuration")
-	// viper.BindPFlag("author", rootCmd.PersistentFlags().Lookup("author"))
-	// viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
-	// viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
-	// viper.SetDefault("license", "apache")
+func getFreeTmpDir() (name string, err error) {
+	tmpDir, err := ioutil.TempDir(os.TempDir(), configuration.ProgramName)
+	if tmpDir == "" {
+		os.Remove(tmpDir)
+	}
+	return tmpDir, err
+}
 
-	// rootCmd.AddCommand(addCmd)
-	// rootCmd.AddCommand(initCmd)
+func SetupCloseHandler(config *configuration.Bm2fsConfig) {
+	cleanTmpDir := func() {
+		os.RemoveAll(config.TmpRoot)
+	}
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		fmt.Println("\r- Cleared temporary directory")
+		cleanTmpDir()
+		os.Exit(0)
+	}()
 }

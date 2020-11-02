@@ -9,9 +9,9 @@
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${fileDirname}",
+      "program": "${workspaceFolder}/main.go",
       "env": {},
-      "args": []
+      "args": ["-i", "test/bookmarks_9_25_20.html", "-c"]
     }
   ]
 }

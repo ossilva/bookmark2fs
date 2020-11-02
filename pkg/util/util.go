@@ -65,12 +65,17 @@ var fn2sMSMap = map[rune]rune{
 //StringToFilename convert original bookmark name to os path
 func StringToFilename(s string) string {
 	osName := runtime.GOOS
+	var newFilename string
 	switch osName {
 	case "windows":
-		return strings.Map(s2fnMS, s)
+		newFilename = strings.Map(s2fnMS, s)
 	default:
-		return strings.Map(s2fn, s)
+		newFilename = strings.Map(s2fn, s)
 	}
+	if len(newFilename) > 77 {
+		newFilename = newFilename[:78] + "..."
+	}
+	return newFilename
 }
 
 //FilenameToString convert os path to original bookmark name
@@ -88,4 +93,13 @@ func FilenameToString(s string) string {
 type BookmarkTracker struct {
 	In  map[string]string
 	Out map[string]string
+}
+
+//New constructor
+func NewTracker() *BookmarkTracker {
+	t := BookmarkTracker{
+		In:  map[string]string{},
+		Out: map[string]string{},
+	}
+	return &t
 }
