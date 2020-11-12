@@ -19,6 +19,7 @@ import (
 	"github.com/ossilva/bookmark2fs/pkg/conversion/base"
 	"github.com/ossilva/bookmark2fs/pkg/conversion/htmlconv"
 	"github.com/ossilva/bookmark2fs/pkg/conversion/jsonconv"
+	"github.com/ossilva/bookmark2fs/pkg/fstree"
 	"github.com/ossilva/bookmark2fs/pkg/prompt"
 	"github.com/ossilva/bookmark2fs/pkg/util"
 )
@@ -56,6 +57,8 @@ var (
 	//for flags
 	inFile       string
 	outFile      string
+	pop          bool
+	depop        bool
 	quietp       bool
 	convertp     bool
 	interactivep bool
@@ -65,7 +68,8 @@ var (
 		Use:   "bookmark2fs [bookmark file]",
 		Short: "Bookmark2fs reads bookmark files as file trees and returns browser-readable html ",
 		Long: `A tool for reading JSON/html bookmarks and converting them into simple file trees. Exports
-		file trees to browser-compatible bookmark html`,
+		file trees to browser-compatible bookmark html. When used interactively (with flag -p),
+		 the program clears temporary directories, otherwise temporary directories remains`,
 		Run: run,
 	}
 )
@@ -83,7 +87,7 @@ func run(cmd *cobra.Command, args []string) {
 		jsonconv.DecodeJSON(reader)
 	}
 
-	var bookmarkRoots map[string]*base.BookmarkNodeBase
+	var bookmarkRoots []*base.BookmarkNodeBase
 	switch filepath.Ext(inFile) {
 	case ".json":
 		bookmarkRoots = jsonconv.DecodeJSON(reader)
@@ -96,7 +100,16 @@ func run(cmd *cobra.Command, args []string) {
 	if convertp {
 		htmlconv.BuildTreeHTML(bookmarkRoots, config.OutputFile)
 		return
+	} else if pop {
+		fstree.PopulateTmpDir(bookmarkRoots, tracker, config.TmpRoot)
+	} else if depop {
+		rootPath := path.Join(os.TempDir(), configuration.ProgramName)
+		check(err)
+
+		exportRoots := fstree.CollectFSTrees(rootPath, tracker)
+		htmlconv.BuildTreeHTML(exportRoots, config.OutputFile)
 	}
+
 	if interactivep {
 		prompt.Init(config, bookmarkRoots, tracker)
 		return
@@ -181,9 +194,11 @@ func Execute() error {
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&inFile, "in", "i", "", "input file to parsed of type 'HTML' or 'JSON'")
 	rootCmd.PersistentFlags().StringVarP(&outFile, "out", "o", "stdout", "filename to write html to")
+	rootCmd.PersistentFlags().BoolVarP(&pop, "populate", "p", false, "populate filesystem tree")
+	rootCmd.PersistentFlags().BoolVarP(&depop, "depopulate", "d", false, "depopulate filesystem tree")
 	rootCmd.PersistentFlags().BoolVarP(&quietp, "quiet", "q", false, "don't print anything to stdout")
 	rootCmd.PersistentFlags().BoolVarP(&convertp, "convert", "c", false, "only perform conversion JSON -> HTML")
-	rootCmd.PersistentFlags().BoolVarP(&interactivep, "prompt", "p", false, "prompt user for commands")
+	rootCmd.PersistentFlags().BoolVarP(&interactivep, "prompt", "", false, "prompt user for commands")
 	tracker = util.NewTracker()
 }
 
