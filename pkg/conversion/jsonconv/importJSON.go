@@ -27,10 +27,10 @@ type BookmarkNodeJSON struct {
 // BookmarkJSON JSON folder roots
 // JSON unmarshal cannot handle conversion to int
 type BookmarkJSON struct {
-	Checksum string                       `json:"checksum"` // md5?
-	Roots    map[string]*BookmarkNodeJSON `json:"roots`
-	Version  string                       `json:"version"`
-	Unparsed map[string]interface{}       `json:",omitempty,remain"`
+	Checksum string                 `json:"checksum"` // md5?
+	Roots    []*BookmarkNodeJSON    `json:"roots`
+	Version  string                 `json:"version"`
+	Unparsed map[string]interface{} `json:",omitempty,remain"`
 }
 
 func check(e error) {
@@ -62,7 +62,7 @@ func parseChromeTimeToUnix(chromeTimeStamp string) int64 {
 // func (bmJSON *bookmarkJSON) UnmarshalJSON(data []byte) error {
 
 //DecodeJSON parses JSON into abstract tree structs
-func DecodeJSON(reader io.Reader) map[string]*base.BookmarkNodeBase {
+func DecodeJSON(reader io.Reader) []*base.BookmarkNodeBase {
 
 	inJSONBytes, _ := ioutil.ReadAll(reader)
 
@@ -70,11 +70,11 @@ func DecodeJSON(reader io.Reader) map[string]*base.BookmarkNodeBase {
 
 	json.Unmarshal(inJSONBytes, &object)
 
-	var rootNodeMap = map[string]*base.BookmarkNodeBase{}
-	for k, v := range object.Roots {
-		rootNodeMap[k] = v.JSONNodeToBase()
+	var rootNodes = []*base.BookmarkNodeBase{}
+	for _, v := range object.Roots {
+		rootNodes = append(rootNodes, v.JSONNodeToBase())
 	}
-	return rootNodeMap
+	return rootNodes
 }
 
 //JSONNodeToBase converts JSON to Base types. TODO incorporate in Marshal

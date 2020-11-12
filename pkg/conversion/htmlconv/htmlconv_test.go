@@ -19,14 +19,22 @@ var testData []string = []string{
 }
 
 var testFilenames []string = []string{
-	"empty_folder.html",
-	"epiphany.html",
-	"firefox2.html",
-	"ie_sans_charset.html",
-	"redditsaver.html",
-	"whitespace_firefox.html",
-	"duplicates.html",
+	"1_empty_folder.html",
+	"2_epiphany.html",
+	"3_firefox2.html",
+	"4_ie_sans_charset.html",
+	"5_redditsaver.html",
+	"6_whitespace_firefox.html",
+	"7_duplicates.html",
 	// firefox_bookmark_keywordHTML
+}
+
+func genNumMap(nums []int) map[string]int {
+	numMap := make(map[string]int)
+	for i, name := range testFilenames {
+		numMap[name] = nums[i]
+	}
+	return numMap
 }
 
 func genFolderNumMap() map[string]int {
@@ -38,24 +46,11 @@ func genFolderNumMap() map[string]int {
 	return folderNumMap
 }
 
-var folderNumMap map[string]int = genFolderNumMap()
-
-func getNodes(node *base.BookmarkNodeBase) []*base.BookmarkNodeBase {
-	nodes := []*base.BookmarkNodeBase{}
-	stack := []*base.BookmarkNodeBase{node}
-	for len(stack) > 0 {
-		v := stack[len(stack)-1]
-		stack = stack[:len(stack)-1]
-		nodes = append(nodes, v)
-		for _, c := range v.Children {
-			stack = append(stack, c)
-		}
-	}
-	return nodes
-}
+var folderNumMap map[string]int = genNumMap([]int{4, 0, 4, 0, 1, 1, 3}[:])
+var nodeNumMap map[string]int = genNumMap([]int{6, 2, 6, 3, 3, 4, 5}[:])
 
 func countFolders(node *base.BookmarkNodeBase) int {
-	nodes := getNodes(node)
+	nodes := base.GetNodes(node)
 	folderNum := 0
 	for _, v := range nodes {
 		if v.Type == "folder" {
@@ -66,7 +61,7 @@ func countFolders(node *base.BookmarkNodeBase) int {
 }
 
 func countFiles(node *base.BookmarkNodeBase) int {
-	nodes := getNodes(node)
+	nodes := base.GetNodes(node)
 	folderNum := 0
 	for _, v := range nodes {
 		if v.Type == "folder" {
@@ -77,7 +72,7 @@ func countFiles(node *base.BookmarkNodeBase) int {
 }
 
 func hasBookmarkBar(node *base.BookmarkNodeBase) bool {
-	nodes := getNodes(node)
+	nodes := base.GetNodes(node)
 	for _, v := range nodes {
 		if v.BookmarkBar {
 			return true
@@ -101,11 +96,23 @@ func TestParseNotCausePanic(t *testing.T) {
 		ParseNetscapeHTML(reader)
 	}
 }
+func TestNodeNumber(t *testing.T) {
+	for fname, folderNum := range nodeNumMap {
+		reader, err := os.Open(fmt.Sprintf("./htmlconv_testdata/%s", fname))
+		check(err)
+		bookmarkRoots := ParseNetscapeHTML(reader)
+		total := 0
+		for _, root := range bookmarkRoots {
+			total += len(base.GetNodes(root))
+		}
+		if total != folderNum {
+			t.Errorf("Number of nodes was incorrect, got: %d, want: %d.", total, folderNum)
+		}
+	}
+}
 
 func TestFolderNumber(t *testing.T) {
-	// tst := map[string]int{"duplicates.html": 3}
 	for fname, folderNum := range folderNumMap {
-		// for fname, folderNum := range tst {
 		reader, err := os.Open(fmt.Sprintf("./htmlconv_testdata/%s", fname))
 		check(err)
 		bookmarkRoots := ParseNetscapeHTML(reader)

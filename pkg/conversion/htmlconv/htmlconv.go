@@ -9,6 +9,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/google/uuid"
 	"github.com/ossilva/bookmark2fs/pkg/conversion/base"
 	"github.com/ossilva/bookmark2fs/pkg/util"
 	"golang.org/x/net/html"
@@ -26,7 +27,7 @@ func check(e error) {
 // }
 
 //BuildTreeHTML serializes abstract trees as template Netscape HTML
-func BuildTreeHTML(roots map[string]*base.BookmarkNodeBase, outPath string) {
+func BuildTreeHTML(roots []*base.BookmarkNodeBase, outPath string) {
 	tmpl, err := template.ParseFiles("./netscape_bookmarks.tmpl")
 	check(err)
 	var w io.Writer
@@ -69,7 +70,7 @@ func standardizeHTML(htmlString string) *strings.Reader {
 }
 
 //ParseNetscapeHTML parses HTML to abstract trees
-func ParseNetscapeHTML(reader io.Reader) map[string]*base.BookmarkNodeBase {
+func ParseNetscapeHTML(reader io.Reader) []*base.BookmarkNodeBase {
 	doc, err := html.Parse(reader)
 	check(err)
 
@@ -86,13 +87,13 @@ func ParseNetscapeHTML(reader io.Reader) map[string]*base.BookmarkNodeBase {
 		}
 	}
 
-	rootNodeMap := map[string]*base.BookmarkNodeBase{}
+	rootNodes := []*base.BookmarkNodeBase{}
 	for c := body.FirstChild; c != nil; c = c.NextSibling {
 		if c.Data == "dt" {
 			rootNode := &base.BookmarkNodeBase{}
-			rootName := getFolderName(c)
-			rootNodeMap[rootName] = rootNode
+			rootNodes = append(rootNodes, rootNode)
 
+			rootNode.UUID = uuid.New()
 			rootNode.Baggage = c
 
 			stack = append(stack, rootNode)
@@ -118,7 +119,9 @@ func ParseNetscapeHTML(reader io.Reader) map[string]*base.BookmarkNodeBase {
 						}
 						if c.Data == "dt" {
 							node := &base.BookmarkNodeBase{}
+							node.UUID = uuid.New()
 							node.Baggage = c
+							node.Parent = n
 							node.Path = n.Path
 							n.Children = append(n.Children, node)
 							stack = append(stack, node)
@@ -167,7 +170,7 @@ func ParseNetscapeHTML(reader io.Reader) map[string]*base.BookmarkNodeBase {
 			n.Baggage = nil
 		}
 	}
-	return rootNodeMap
+	return rootNodes
 }
 
 func skipPTag(node *html.Node) *html.Node {

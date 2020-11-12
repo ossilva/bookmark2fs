@@ -1,0 +1,207 @@
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+	"path"
+	"regexp"
+	"runtime"
+	"strconv"
+	"strings"
+
+	"golang.org/x/net/html"
+)
+
+func translator(m map[rune]rune) func(rune) rune {
+	return func(r rune) rune {
+		val, ok := m[r]
+		if ok {
+			return val
+		}
+		return r
+	}
+}
+
+var s2fn = translator(s2fnMap)
+var s2fnMap = map[rune]rune{
+	'<':  '﹤',
+	'>':  '﹥',
+	':':  'ː',
+	'"':  '“',
+	'/':  '⁄',
+	'\\': '∖',
+	'|':  '⼁',
+	'?':  '﹖',
+	'*':  '﹡',
+	'.':  '⋅',
+}
+
+var fn2s = translator(fn2sMap)
+var fn2sMap = map[rune]rune{
+	'﹤': '<',
+	'﹥': '>',
+	'ː': ':',
+	'“': '"',
+	'⁄': '/',
+	'∖': '\\',
+	'⼁': '|',
+	'﹖': '?',
+	'﹡': '*',
+	'⋅': '.',
+}
+
+//As above, but the minimum I needed for my files/filesystem/driver. Most
+//notably, '<" and '>" seem to work fine, so there's no sense mangling them.
+var s2fnMS = translator(s2fnMSMap)
+var s2fnMSMap = map[rune]rune{
+	':': 'ː',
+	'?': '﹖',
+	'|': '⼁',
+	'/': '⁄',
+	'.': '⋅',
+}
+var fn2sMS = translator(fn2sMSMap)
+var fn2sMSMap = map[rune]rune{
+	'ː': ':',
+	'﹖': '?',
+	'⼁': '|',
+	'⁄': '/',
+	'⋅': '.',
+}
+
+func StringToFilename(s string) string {
+	osName := runtime.GOOS
+	switch osName {
+	case "windows":
+		return strings.Map(s2fnMS, s)
+	default:
+		return strings.Map(s2fn, s)
+	}
+}
+func filenameToString(s string) string {
+	osName := runtime.GOOS
+	switch osName {
+	case "windows":
+		return strings.Map(fn2sMS, s)
+	default:
+		return strings.Map(fn2s, s)
+	}
+}
+
+type bookmarkNodeBase struct {
+	Children     []*bookmarkNodeBase `json:"children"`
+	DateCreated  int64               `json:"date_added"`
+	DateModified int64               `json:"date_modified"`
+	Name         string              `json:"name"`
+	Type         string              `json:"type"`
+	URL          string              `json:"url"`
+	Path         string
+	BookmarkBar  bool
+	Baggage      *html.Node
+}
+
+func check(e error) {
+	if e != nil {
+		panic(e)
+	}
+}
+
+// Tokenize HTML from stdin.
+func main() {
+	netscapeHTML, err := ioutil.ReadFile("./bookmarks_9_25_20.html")
+	check(err)
+	netscapeHTMLString := string(netscapeHTML)
+
+	r, _ := regexp.Compile("<\\s*p\\s*>")
+	htmlReader := strings.NewReader(r.ReplaceAllString(netscapeHTMLString, ""))
+
+	doc, err := html.Parse(htmlReader)
+	check(err)
+	stack := []*bookmarkNodeBase{}
+	rootNodes := []*bookmarkNodeBase{}
+
+	fmt.Println(doc)
+	var body *html.Node
+	for d := doc.FirstChild; d != nil; d = d.NextSibling {
+		if d.Type == html.ElementNode && (d.Data == "html" || d.Data == "body") {
+			d = d.FirstChild
+		}
+		if d.Type == html.ElementNode && d.Data == "dl" {
+			fmt.Println(d)
+			body = d
+			break
+		}
+	}
+
+	for c := body.FirstChild; c != nil; c = c.NextSibling {
+		if c.Data == "dt" {
+			rootNode := &bookmarkNodeBase{}
+			rootNode.Baggage = c
+			stack = append(stack, rootNode)
+		}
+	}
+
+	for len(stack) > 0 { //until stack is empty,
+		n := stack[len(stack)-1]
+
+		if n.Baggage.Type == html.ElementNode && n.Baggage.FirstChild != nil {
+			for nodeC := n.Baggage.FirstChild; nodeC != nil; nodeC = nodeC.NextSibling {
+				fmt.Println(nodeC.Data)
+				if nodeC.Data == "dl" { //type: folder
+					dirCn := nodeC
+					// dirCn := nodeC.FirstChild // children enclosed in <p></p>
+					for c := dirCn.FirstChild; nodeC != nil; nodeC = nodeC.NextSibling {
+						node := &bookmarkNodeBase{}
+						node.Baggage = c
+						node.Path = n.Path
+						n.Children = append(n.Children, node)
+						stack = append(stack, node)
+					}
+				} else if nodeC.Data == "dt" { //|| nodeC.Data == "" {
+					switch n.Baggage.Data {
+					case "h3":
+						for _, a := range nodeC.Attr {
+							if a.Key == "add_date" {
+								n.DateCreated, err = strconv.ParseInt(a.Val, 10, 64)
+								check(err)
+								break
+							}
+							if a.Key == "last_modified" {
+								n.DateModified, err = strconv.ParseInt(a.Val, 10, 64)
+								check(err)
+								break
+							}
+							if a.Key == "personal_toobar_folder" && a.Key == "true" {
+								n.BookmarkBar = true
+								break
+							}
+						}
+					case "a": //type: file
+						for _, a := range nodeC.Attr {
+							if a.Key == "add_date" {
+								n.DateCreated, err = strconv.ParseInt(a.Val, 10, 64)
+								check(err)
+								break
+							}
+							if a.Key == "href" {
+								n.URL = a.Val
+								break
+							}
+						}
+					}
+					n.Name = nodeC.FirstChild.Data
+					n.Path = path.Join(n.Path, StringToFilename(n.Name))
+				}
+			}
+
+			// append(stack, *nodePair{np, c})
+			// t.Path = p.Path + t.Name
+			// append(p.Children, t)
+			// k
+
+			fmt.Println(rootNodes)
+		}
+	}
+
+	fmt.Println(rootNodes)
+}

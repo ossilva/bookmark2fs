@@ -8,16 +8,17 @@ import (
 	"github.com/ossilva/bookmark2fs/pkg/configuration"
 	"github.com/ossilva/bookmark2fs/pkg/conversion/base"
 	"github.com/ossilva/bookmark2fs/pkg/conversion/htmlconv"
+	"github.com/ossilva/bookmark2fs/pkg/db"
 	"github.com/ossilva/bookmark2fs/pkg/fstree"
 	"github.com/ossilva/bookmark2fs/pkg/util"
 )
 
 //Init prompts user for input
-func Init(config *configuration.Bm2fsConfig, bmRoots map[string]*base.BookmarkNodeBase, tracker *util.BookmarkTracker) {
+func Init(config *configuration.Bm2fsConfig, bmRoots []*base.BookmarkNodeBase, tracker *util.BookmarkTracker) {
 	fmt.Println("******************************************")
 
-	var tmpRootPathMap map[string]string
-	var exportRoots map[string]*base.BookmarkNodeBase
+	// var tmpRootPaths []string
+	var exportRoots []*base.BookmarkNodeBase
 	var tmpDirPath string
 
 	for {
@@ -27,11 +28,11 @@ func Init(config *configuration.Bm2fsConfig, bmRoots map[string]*base.BookmarkNo
 				config.TmpRoot,
 			),
 			Items: []string{
-				"(re)populate filesystem tree",
+				"populate filesystem tree",
 				"export to browser HTML",
 				"change root directory",
-				"create/save to sqlite",
-				"show changes",
+				"create/save sqlite",
+				// "show changes",
 				"EXIT",
 			},
 		}
@@ -57,23 +58,29 @@ func Init(config *configuration.Bm2fsConfig, bmRoots map[string]*base.BookmarkNo
 				tryPath, _ = prompt.Run()
 			}
 			config.TmpRoot = tryPath
-		}
-		if result == "populate filesystem tree" {
-			tmpDirPath, tmpRootPathMap = fstree.PopulateTmpDir(bmRoots, tracker, config.TmpRoot)
+		} else if result == "populate filesystem tree" {
+			tmpDirPath, _ = fstree.PopulateTmpDir(bmRoots, tracker, config.TmpRoot)
 			defer os.RemoveAll(tmpDirPath)
-		}
-		if result == "export to browser HTML" {
-			exportRoots = fstree.CollectFSTrees(tmpRootPathMap, tracker)
+		} else if result == "export to browser HTML" {
+			exportRoots = fstree.CollectFSTrees(tmpDirPath, tracker)
 			htmlconv.BuildTreeHTML(exportRoots, config.OutputFile)
-			// fmt.Println(exportRoots)
-			// fmt.Println(config.OutputFile)
-		}
-		if result == "show changes" {
-		}
-		if result == "export to browser HTML" {
-
-		}
-		if result == "EXIT" {
+		} else if result == "show changes" {
+			// TODO varies according to bookmark array source
+		} else if result == "create/save sqlite" {
+			var rootsToSave []*base.BookmarkNodeBase
+			if exportRoots != nil {
+				rootsToSave = exportRoots
+			} else if bmRoots != nil {
+				rootsToSave = bmRoots
+			}
+			cache := db.OpenDBCache()
+			for _, root := range rootsToSave {
+				for _, node := range base.GetNodesBFS(root) {
+					rec := node.ToRecordable()
+					db.BmInsertToTable(rec, cache)
+				}
+			}
+		} else if result == "EXIT" {
 			return
 		}
 	}

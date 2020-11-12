@@ -89,17 +89,21 @@ func FilenameToString(s string) string {
 	}
 }
 
+type TrackerKey struct {
+	Path, Name, URL, Created string
+}
+
 //BookmarkTracker is a simple wrapper for tracking input and output bookmarks
 type BookmarkTracker struct {
-	In  map[string]string
-	Out map[string]string
+	In  map[TrackerKey]string
+	Out map[TrackerKey]string
 }
 
 //New constructor
 func NewTracker() *BookmarkTracker {
 	t := BookmarkTracker{
-		In:  map[string]string{},
-		Out: map[string]string{},
+		In:  make(map[TrackerKey]string),
+		Out: make(map[TrackerKey]string),
 	}
 	return &t
 }
