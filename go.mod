@@ -12,6 +12,7 @@ require (
 	github.com/google/uuid v1.1.2
 	github.com/lib/pq v1.8.0
 	github.com/manifoldco/promptui v0.8.0
+	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/spf13/cobra v1.1.0
 	github.com/spf13/viper v1.7.1 // indirect
 	github.com/tdewolff/parse/v2 v2.5.4 // indirect

@@ -29,7 +29,9 @@ func check(e error) {
 func mkFolderNameFile(path string, folderPath string) {
 	folderNamePath := path + "/~FOLDERNAME"
 	err := ioutil.WriteFile(folderNamePath, []byte(filepath.Base(folderPath)+"\n"), 0644)
-	check(err)
+	if err != nil {
+		fmt.Println(fmt.Sprintf("Could not write to temporary directory: %s", path))
+	}
 }
 
 func getUniqFilename(filepath string) string {
@@ -74,6 +76,7 @@ func mkFileTreeDir(tmpRoot string) string {
 	}
 
 	if err == nil {
+		mkFolderNameFile(tmpRoot, "TEMP_ROOT")
 		return tmpRoot
 	}
 
@@ -92,7 +95,7 @@ func PopulateTmpDir(
 	populateRootDir := func(rootNode *base.BookmarkNodeBase) string {
 		stack := []*base.BookmarkNodeBase{rootNode}
 		//TODO creation time is changed in sequence after file creation
-		nodesByDepth := []*base.BookmarkNodeBase{rootNode}
+		nodesByDFS := []*base.BookmarkNodeBase{rootNode}
 		filename := util.StringToFilename(rootNode.Name)
 		rootNode.Path = path.Join(tmpDirPath, filename)
 		for len(stack) > 0 {
@@ -117,33 +120,26 @@ func PopulateTmpDir(
 
 				err := ioutil.WriteFile(uniqFileName, contents, 0644)
 				check(err)
-				// set file times according to date added
-				ctime := time.Unix(fileNode.DateCreated, 0)
-				err = os.Chtimes(fileNode.Path, ctime, ctime)
-				check(err)
 
 			case "folder":
 				mkdirErr := os.Mkdir(uniqFileName, 0755)
 				check(mkdirErr)
 				mkFolderNameFile(uniqFileName, fileNode.Path)
 
-				ctime := time.Unix(fileNode.DateCreated, 0)
-				atime := time.Unix(fileNode.DateModified, 0)
-				err := os.Chtimes(fileNode.Path, atime, ctime)
-				check(err)
-
 				for _, child := range fileNode.Children {
 					childFName := util.StringToFilename(child.Name)
 					child.Path = path.Join(nodePath, childFName)
 					stack = append(stack, child)
-					nodesByDepth = append(nodesByDepth, child)
+					nodesByDFS = append(nodesByDFS, child)
 				}
 			default:
 				panic("Unrecognized node type:" + string(fileNode.Type))
 			}
 		}
-		for i, _ := range nodesByDepth {
-			node := nodesByDepth[len(nodesByDepth)-1-i]
+		// times set after file tree population due to inode linking
+		for i := range nodesByDFS {
+			// set file times according to date added
+			node := nodesByDFS[len(nodesByDFS)-1-i] // leaves added after branches
 			ctime := time.Unix(node.DateCreated, 0)
 			atime := time.Unix(node.DateModified, 0)
 			err := os.Chtimes(node.Path, atime, ctime)
@@ -203,9 +199,11 @@ func CollectFSTree(path string, tracker *util.BookmarkTracker) *base.BookmarkNod
 			}
 			URL = contents[0]
 			Name = contents[1]
+			if Name == "~UNNAMED" {
+				Name = ""
+			}
 		}
 
-		// dir ctime cannot be stat'd for some reason
 		node := base.BookmarkNodeBase{
 			UUID:         uuid.New(),
 			DateModified: int64(t.AccessTime().Unix()),
@@ -235,15 +233,16 @@ func CollectFSTree(path string, tracker *util.BookmarkTracker) *base.BookmarkNod
 
 	for len(stack) > 0 { //until stack is empty,
 		file := stack[len(stack)-1] //pop entry from stack
-		t, err := times.Stat(file.Path)
-		check(err)
 		stack = stack[:len(stack)-1]
-		children, _ := ioutil.ReadDir(file.Path) //get the children of entry
-		for _, c := range children {             //for each child
+		dirFiles, _ := ioutil.ReadDir(file.Path) //get the children of entry
+		for _, c := range dirFiles {             //for each child
 			if c.Name() == "~FOLDERNAME" {
 				continue
 			}
-			child := toFileObj(c, t, filepath.Join(file.Path, c.Name())) //turn it into a base.BookmarkNodeBase object
+			childPath := filepath.Join(file.Path, c.Name())
+			t, err := times.Stat(childPath)
+			check(err)
+			child := toFileObj(c, t, childPath) //turn it into a base.BookmarkNodeBase object
 			child.Parent = file
 			file.Children = append(file.Children, child) //append it to the children of the current file popped
 			stack = append(stack, child)                 //append the child to the stack, so the same process can be run again

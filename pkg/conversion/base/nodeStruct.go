@@ -1,19 +1,24 @@
 package base
 
 import (
+	"math/rand"
+
+	"github.com/Masterminds/squirrel"
+	"github.com/Masterminds/structable"
 	"github.com/google/uuid"
-	"github.com/ossilva/bookmark2fs/pkg/db"
 	"golang.org/x/net/html"
 )
 
 //SupportedFields contains fields which are preserved in (de)serialization
 var SupportedFields []string = []string{
-	// "DateCreated",
+	"DateCreated",
 	"Name",
 	"Type",
 	"URL",
 	"Path",
 }
+
+var bookmarkTableName = "bookmarks"
 
 func GetNodes(node *BookmarkNodeBase) []*BookmarkNodeBase {
 	nodes := []*BookmarkNodeBase{}
@@ -44,16 +49,38 @@ type BookmarkNodeBase struct {
 	Baggage      *html.Node
 }
 
-func (node *BookmarkNodeBase) ToRecordable() *db.RecordableNode {
-	rec := &db.RecordableNode{
-		ID:           node.UUID.String(),
-		ParentId:     node.Parent.UUID.String(),
-		DateCreated:  node.DateCreated,
-		DateModified: node.DateModified,
-		Name:         node.Name,
-		Type:         node.Type,
-		URL:          node.URL,
+type RecordableNode struct {
+	structable.Recorder
+	builder      squirrel.StatementBuilderType
+	ID           int64  `stbl:"id,PRIMARY_KEY"`
+	UUID         string `stbl:"uuid"`
+	ParentUUID   string `stbl:"parent_uuid"`
+	DateCreated  int64  `stbl:"date_created"`
+	DateModified int64  `stbl:"date_modified"`
+	Name         string `stbl:"name"`
+	Type         string `stbl:"type"`
+	URL          string `stbl:"url"`
+}
+
+// ToRecordable converts base node to a recordable struct
+func (node *BookmarkNodeBase) ToRecordable() *RecordableNode {
+	var parentUUID string
+	if node.Parent != nil {
+		parentUUID = node.Parent.UUID.String()
+	} else {
+		parentUUID = ""
 	}
+
+	rec := new(RecordableNode)
+	rec.ID = rand.Int63()
+	rec.UUID = node.UUID.String()
+	rec.ParentUUID = parentUUID
+	rec.DateCreated = node.DateCreated
+	rec.DateModified = node.DateModified
+	rec.Name = node.Name
+	rec.Type = node.Type
+	rec.URL = node.URL
+
 	return rec
 }
 
@@ -73,8 +100,6 @@ func GetNodesBFS(bookmarks *BookmarkNodeBase) []*BookmarkNodeBase {
 		for _, c := range node.Children {
 			queue = append(queue, c)
 		}
-		return nodes
 	}
-
 	return nodes
 }
