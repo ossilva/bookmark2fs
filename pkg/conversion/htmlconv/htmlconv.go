@@ -1,6 +1,7 @@
 package htmlconv
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path"
@@ -115,7 +116,6 @@ func ParseNetscapeHTML(reader io.Reader) []*base.BookmarkNodeBase {
 					for c := dirCn.FirstChild; c != nil; c = c.NextSibling {
 						if c.Data == "p" {
 							continue
-							// c = c.FirstChild
 						}
 						if c.Data == "dt" {
 							node := &base.BookmarkNodeBase{}
@@ -127,7 +127,7 @@ func ParseNetscapeHTML(reader io.Reader) []*base.BookmarkNodeBase {
 							stack = append(stack, node)
 						}
 					}
-				} else if dirCn.Data == "h3" || dirCn.Data == "a" {
+				} else { // if dirCn.Data == "h3" || dirCn.Data == "a" {
 					switch dirCn.Data {
 					case "h3": //type: folder
 						n.Type = "folder"
@@ -153,18 +153,25 @@ func ParseNetscapeHTML(reader io.Reader) []*base.BookmarkNodeBase {
 							if a.Key == "add_date" {
 								n.DateCreated, err = strconv.ParseInt(a.Val, 10, 64)
 								check(err)
-								break
+								continue
 							}
 							if a.Key == "href" {
 								n.URL = a.Val
-								break
+								continue
 							}
 						}
+					default:
+						continue
 					}
 					if dirCn.FirstChild != nil {
 						n.Name = dirCn.FirstChild.Data
+					} else {
+						n.Name = "~UNNAMED"
 					}
 					n.Path = path.Join(n.Path, util.StringToFilename(n.Name))
+					if n.DateCreated == 0 {
+						fmt.Println("Error")
+					}
 				}
 			}
 			n.Baggage = nil

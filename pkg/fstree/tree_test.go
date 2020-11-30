@@ -2,6 +2,7 @@ package fstree
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"reflect"
 	"testing"
@@ -26,6 +27,8 @@ func nodesSimilar(n1 *base.BookmarkNodeBase, n2 *base.BookmarkNodeBase) bool {
 	if n1.Name == n2.Name &&
 		n1.Type == n2.Type &&
 		n1.URL == n2.URL &&
+		n1.DateCreated == n2.DateCreated &&
+		// n1.DateModified == n2.DateModified &&
 		n1.Path == n2.Path {
 		return true
 	}
@@ -72,10 +75,24 @@ func TestCollectTrees(t *testing.T) {
 		if !eq {
 			differingNodes = append(differingNodes, n1.Name)
 			fmt.Println(n1.DateCreated, n2.DateCreated)
+			fmt.Println(n1.DateModified, n2.DateModified)
 		}
 	}
 	if len(differingNodes) > 0 {
 		t.Errorf(fmt.Sprintf("Conversion for the following nodes %v", differingNodes))
 	}
 
+}
+func TestRootFolderNumber(t *testing.T) {
+	for fname, folderNum := range folderNumMap {
+		reader, err := os.Open(fmt.Sprintf("./htmlconv_testdata/%s", fname))
+		check(err)
+		bookmarkRoots := ParseNetscapeHTML(reader)
+		dirFiles, _ := ioutil.ReadDir(file.Path) //get the children of entry
+		numRoots := len(bookmarkRoots)
+		numDirFiles := len(dirFiles)
+		if numDirFiles != numRoots {
+			t.Errorf("Number of root folders was incorrect, got: %d, want: %d.", numRoots, numDirFiles)
+		}
+	}
 }

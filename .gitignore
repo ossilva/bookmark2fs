@@ -2,3 +2,7 @@ export-chrome/
 chrome-export/
 
 test.goenum.go
+
+test_data
+
+structable
