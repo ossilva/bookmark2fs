@@ -6,8 +6,11 @@ test.goenum.go
 test_data
 
 structable
+<<<<<<< HEAD
 bookmark2fs
 sqlite
 todo.md
 todos.txt
 bookmark2fs.sqlite
+=======
+>>>>>>> 2f89b3b3d9e9982139a75351d9328273fb5b563c
