@@ -24,7 +24,6 @@ func BmInsertToTable(bookmark *base.RecordableNode, db squirrel.DBProxyBeginner)
 
 func OpenDBCache() (squirrel.DBProxyBeginner, *sql.DB) {
 	con, err := sql.Open(driver, "bookmark2fs.sqlite")
-	// con, err := sql.Open(driver, ":memory:")
 	if err != nil {
 		fmt.Printf("Couldn't Open database: %s\n", err)
 	}

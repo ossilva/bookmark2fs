@@ -39,9 +39,19 @@ var options = map[string]optionItem{
 }
 
 func getOptionSlice() []optionItem {
-	var items = []optionItem{}
-	for _, v := range options {
-		items = append(items, v)
+
+	var itemSlice []string = []string{
+		"populate filesystem tree",
+		"export to browser HTML",
+		"change bookmark store",
+		"change root directory",
+		"create/save sqlite",
+		"EXIT",
+	}
+	items := make([]optionItem, len(itemSlice))
+
+	for i, v := range itemSlice {
+		items[i] = optionItem(v)
 	}
 	return items
 }
@@ -109,8 +119,10 @@ func Init(cmd *cobra.Command, args []string) {
 			tmpDirPath, _ = fstree.PopulateTmpDir(bmRoots, tracker, config.TmpRoot)
 			defer os.RemoveAll(tmpDirPath)
 		} else if options[result] == options["export to browser HTML"] {
-			exportNodeRoots = fstree.CollectFSTrees(tmpDirPath, tracker)
-			htmlconv.BuildTreeHTML(exportNodeRoots, config.OutputFile)
+			if _, err := os.Stat(tmpDirPath); err == nil {
+				exportNodeRoots = fstree.CollectFSTrees(tmpDirPath, tracker)
+				htmlconv.BuildTreeHTML(exportNodeRoots, config.OutputFile)
+			}
 		} else if options[result] == options["change bookmark store"] {
 			bmFile := promptBookmarkFile()
 			bmRoots = ReadInputFile(bmFile)
@@ -132,11 +144,6 @@ func Init(cmd *cobra.Command, args []string) {
 }
 
 func promptBookmarkFile() string {
-	// validate := func(path string) error {
-	// 	_, err := os.Stat(path)
-	// 	check(err)
-	// 	return nil
-	// }
 
 	defaultPath, err := os.Getwd()
 	if err != nil {
