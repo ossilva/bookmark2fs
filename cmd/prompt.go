@@ -26,6 +26,26 @@ For many years people have printed back to the screen.`,
 	Run: Init,
 }
 
+type optionItem string
+
+var options = map[string]optionItem{
+	"populate filesystem tree": "populate filesystem tree",
+	"export to browser HTML":   "export to browser HTML",
+	"change bookmark store":    "change bookmark store",
+	"change root directory":    "change root directory",
+	"create/save sqlite":       "create/save sqlite",
+	// "show changes": "show changes"// TODO,
+	"EXIT": "EXIT",
+}
+
+func getOptionSlice() []optionItem {
+	var items = []optionItem{}
+	for _, v := range options {
+		items = append(items, v)
+	}
+	return items
+}
+
 //Init prompts user for input
 func Init(cmd *cobra.Command, args []string) {
 	fmt.Println("******************************************")
@@ -53,21 +73,15 @@ func Init(cmd *cobra.Command, args []string) {
 	var tmpDirPath string
 	var tracker = util.NewTracker()
 
+	items := getOptionSlice()
+
 	for {
 		prompt := promptui.Select{
 			Label: fmt.Sprintf(
 				"Select operation [temporary dir: %s]",
 				config.TmpRoot,
 			),
-			Items: []string{
-				"populate filesystem tree",
-				"export to browser HTML",
-				"change bookmark store",
-				"change root directory",
-				"create/save sqlite",
-				// "show changes",
-				"EXIT",
-			},
+			Items: items,
 		}
 		_, result, _ := prompt.Run()
 
@@ -91,18 +105,18 @@ func Init(cmd *cobra.Command, args []string) {
 				tryPath, _ = prompt.Run()
 			}
 			config.TmpRoot = tryPath
-		} else if result == "populate filesystem tree" {
+		} else if options[result] == options["populate filesystem tree"] {
 			tmpDirPath, _ = fstree.PopulateTmpDir(bmRoots, tracker, config.TmpRoot)
 			defer os.RemoveAll(tmpDirPath)
-		} else if result == "export to browser HTML" {
+		} else if options[result] == options["export to browser HTML"] {
 			exportNodeRoots = fstree.CollectFSTrees(tmpDirPath, tracker)
 			htmlconv.BuildTreeHTML(exportNodeRoots, config.OutputFile)
-		} else if result == "change bookmark store" {
+		} else if options[result] == options["change bookmark store"] {
 			bmFile := promptBookmarkFile()
 			bmRoots = ReadInputFile(bmFile)
-		} else if result == "show changes" {
+		} else if options[result] == options["show changes"] {
 			// TODO varies according to bookmark array source
-		} else if result == "create/save sqlite" {
+		} else if options[result] == options["create/save sqlite"] {
 			var rootsToSave []*base.BookmarkNodeBase
 			if exportNodeRoots != nil {
 				rootsToSave = exportNodeRoots
@@ -110,7 +124,7 @@ func Init(cmd *cobra.Command, args []string) {
 				rootsToSave = bmRoots
 			}
 			db.BackupNodeRoots(rootsToSave)
-		} else if result == "EXIT" {
+		} else if options[result] == options["EXIT"] {
 			return
 		}
 	}

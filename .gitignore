@@ -2,6 +2,7 @@ export-chrome/
 chrome-export/
 
 test.goenum.go
+bookmark2fs
 
 test_data
 

@@ -61,8 +61,7 @@ var (
 	backupp  bool
 	convertp bool
 	quietp   bool
-	// interactivep bool
-	tracker *util.BookmarkTracker
+	tracker  *util.BookmarkTracker
 
 	rootCmd = &cobra.Command{
 		Use:   "bookmark2fs [bookmark file]",
@@ -124,18 +123,21 @@ func readUserInput() {
 
 // Execute executes the root command.
 func Execute() error {
+	if len(os.Args) == 1 {
+		os.Args = append(os.Args, "prompt")
+	}
+
 	return rootCmd.Execute()
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&inFile, "in", "i", "", "input file to parsed of type 'HTML' or 'JSON'")
+	rootCmd.PersistentFlags().StringVarP(&inFile, "in", "i", "", "file to parse (of type 'HTML' or 'JSON')")
 	rootCmd.PersistentFlags().StringVarP(&outFile, "out", "o", "stdout", "filename to write html to")
 	rootCmd.PersistentFlags().BoolVarP(&popp, "populate", "p", false, "populate filesystem tree")
 	rootCmd.PersistentFlags().BoolVarP(&depopp, "depopulate", "d", false, "depopulate filesystem tree")
 	rootCmd.PersistentFlags().BoolVarP(&backupp, "backup", "b", false, "backup to sqlite database")
 	rootCmd.PersistentFlags().BoolVarP(&convertp, "convert", "c", false, "only perform conversion JSON -> HTML")
 	rootCmd.PersistentFlags().BoolVarP(&quietp, "quiet", "q", false, "don't print anything to stdout")
-	// rootCmd.PersistentFlags().BoolVarP(&interactivep, "prompt", "", false, "prompt user for commands")
 	rootCmd.AddCommand(cmdPrompt)
 	tracker = util.NewTracker()
 }
@@ -172,7 +174,8 @@ func ReadInputFile(path string) []*base.BookmarkNodeBase {
 		if path == "Bookmarks" {
 			bookmarkRoots = jsonconv.DecodeJSON(reader)
 		} else {
-			panic("File name not of supported type!")
+			fmt.Println("File name not of supported type!")
+			os.Exit(1)
 		}
 	case ".json":
 		bookmarkRoots = jsonconv.DecodeJSON(reader)
