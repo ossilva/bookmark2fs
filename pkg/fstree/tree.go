@@ -137,17 +137,13 @@ func PopulateTmpDir(
 	tmpDirPath := mkFileTreeDir(tmpRoot)
 
 	populateRootDir := func(rootNode *base.BookmarkNodeBase) string {
-		// stack := []*base.BookmarkNodeBase{rootNode}
 		//TODO creation time is changed in sequence after file creation
 		historyStack := newNodeHistoryStack(rootNode)
-		// nodesByDFS := []*base.BookmarkNodeBase{rootNode}
 		filename := util.StringToFilename(rootNode.Name)
 		rootNode.Path = path.Join(tmpDirPath, filename)
 		for len(historyStack.stack) > 0 {
 			fileNode := historyStack.pop()
-			// fileNode := stack[len(stack)-1]
 			tracker.Insert(fileNode)
-			// stack = stack[:len(stack)-1]
 
 			nodePath := fileNode.Path
 			newFilename := getUniqFilename(nodePath)
