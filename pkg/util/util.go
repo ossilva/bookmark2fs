@@ -3,6 +3,8 @@ package util
 import (
 	"runtime"
 	"strings"
+
+	"github.com/ossilva/bookmark2fs/pkg/conversion/base"
 )
 
 func translator(m map[rune]rune) func(rune) rune {
@@ -106,4 +108,14 @@ func NewTracker() *BookmarkTracker {
 		Out: make(map[TrackerKey]string),
 	}
 	return &t
+}
+
+func (tracker *BookmarkTracker) Insert(node *base.BookmarkNodeBase) {
+	key := TrackerKey{
+		Name:    node.Name,
+		Path:    node.Path,
+		URL:     node.URL,
+		Created: string(node.DateCreated),
+	}
+	tracker.In[key] = node.Path
 }

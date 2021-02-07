@@ -20,17 +20,42 @@ import (
 	"gopkg.in/djherbis/times.v1"
 )
 
+type nodeHistoryStack struct {
+	// would be better use pointer to top to avoid duplication
+	stack   []*base.BookmarkNodeBase
+	history []*base.BookmarkNodeBase
+}
+
+func newNodeHistoryStack(initialNode *base.BookmarkNodeBase) *nodeHistoryStack {
+	nodeHistoryStack := new(nodeHistoryStack)
+	nodeHistoryStack.history = []*base.BookmarkNodeBase{initialNode}
+	nodeHistoryStack.stack = []*base.BookmarkNodeBase{initialNode}
+	return nodeHistoryStack
+}
+
+func (historyStack *nodeHistoryStack) push(node *base.BookmarkNodeBase) {
+	historyStack.stack = append(historyStack.stack, node)
+	historyStack.history = append(historyStack.history, node)
+}
+
+func (historyStack *nodeHistoryStack) pop() *base.BookmarkNodeBase {
+	stack := &historyStack.stack
+	node := (*stack)[len(*stack)-1]
+	*stack = (*stack)[:len(*stack)-1]
+	return node
+}
+
 func check(e error) {
 	if e != nil {
 		panic(e)
 	}
 }
 
-func mkFolderNameFile(path string, folderPath string) {
-	folderNamePath := path + "/~FOLDERNAME"
+func mkFolderNameFile(pathString string, folderPath string) {
+	folderNamePath := pathString + "/~FOLDERNAME"
 	err := ioutil.WriteFile(folderNamePath, []byte(filepath.Base(folderPath)+"\n"), 0644)
 	if err != nil {
-		fmt.Println(fmt.Sprintf("Could not write to temporary directory: %s", path))
+		fmt.Println(fmt.Sprintf("Could not write to temporary directory: %s", pathString))
 	}
 }
 
@@ -83,6 +108,25 @@ func mkFileTreeDir(tmpRoot string) string {
 	panic("Given temporary directory path already exists")
 
 }
+func createURLFile(node *base.BookmarkNodeBase, filename string) {
+	contents := []byte(node.URL + "\n" + node.Name + "\n")
+	err := ioutil.WriteFile(filename, contents, 0644)
+	check(err)
+}
+
+func createFolderDir(node *base.BookmarkNodeBase, filename string) {
+	mkdirErr := os.Mkdir(filename, 0755)
+	check(mkdirErr)
+	mkFolderNameFile(filename, node.Path)
+}
+
+func stackFolderChildren(stack *nodeHistoryStack, children []*base.BookmarkNodeBase, nodePath string) {
+	for _, child := range children {
+		childFName := util.StringToFilename(child.Name)
+		child.Path = path.Join(nodePath, childFName)
+		stack.push(child)
+	}
+}
 
 //PopulateTmpDir reflects abstract trees to the filesystem as files and dirs
 func PopulateTmpDir(
@@ -93,53 +137,35 @@ func PopulateTmpDir(
 	tmpDirPath := mkFileTreeDir(tmpRoot)
 
 	populateRootDir := func(rootNode *base.BookmarkNodeBase) string {
-		stack := []*base.BookmarkNodeBase{rootNode}
+		// stack := []*base.BookmarkNodeBase{rootNode}
 		//TODO creation time is changed in sequence after file creation
-		nodesByDFS := []*base.BookmarkNodeBase{rootNode}
+		historyStack := newNodeHistoryStack(rootNode)
+		// nodesByDFS := []*base.BookmarkNodeBase{rootNode}
 		filename := util.StringToFilename(rootNode.Name)
 		rootNode.Path = path.Join(tmpDirPath, filename)
-		for len(stack) > 0 {
-			fileNode := stack[len(stack)-1]
+		for len(historyStack.stack) > 0 {
+			fileNode := historyStack.pop()
+			// fileNode := stack[len(stack)-1]
+			tracker.Insert(fileNode)
+			// stack = stack[:len(stack)-1]
+
 			nodePath := fileNode.Path
-
-			key := util.TrackerKey{
-				Name:    fileNode.Name,
-				Path:    fileNode.Path,
-				URL:     fileNode.URL,
-				Created: string(fileNode.DateCreated),
-			}
-			tracker.In[key] = fileNode.Path
-
-			stack = stack[:len(stack)-1]
-
-			uniqFileName := getUniqFilename(fileNode.Path)
+			newFilename := getUniqFilename(nodePath)
 
 			switch fileNode.Type {
 			case "url":
-				contents := []byte(fileNode.URL + "\n" + fileNode.Name + "\n")
-
-				err := ioutil.WriteFile(uniqFileName, contents, 0644)
-				check(err)
-
+				createURLFile(fileNode, newFilename)
 			case "folder":
-				mkdirErr := os.Mkdir(uniqFileName, 0755)
-				check(mkdirErr)
-				mkFolderNameFile(uniqFileName, fileNode.Path)
-
-				for _, child := range fileNode.Children {
-					childFName := util.StringToFilename(child.Name)
-					child.Path = path.Join(nodePath, childFName)
-					stack = append(stack, child)
-					nodesByDFS = append(nodesByDFS, child)
-				}
+				createFolderDir(fileNode, newFilename)
+				stackFolderChildren(historyStack, fileNode.Children, nodePath)
 			default:
 				panic("Unrecognized node type:" + string(fileNode.Type))
 			}
 		}
 		// times set after file tree population due to inode linking
-		for i := range nodesByDFS {
+		for i := range historyStack.history {
 			// set file times according to date added
-			node := nodesByDFS[len(nodesByDFS)-1-i] // leaves added after branches
+			node := historyStack.history[len(historyStack.history)-1-i] // leaves added after branches
 			ctime := time.Unix(node.DateCreated, 0)
 			atime := time.Unix(node.DateModified, 0)
 			err := os.Chtimes(node.Path, atime, ctime)

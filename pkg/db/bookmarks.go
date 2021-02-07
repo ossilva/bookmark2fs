@@ -15,7 +15,7 @@ import (
 const BookmarkTable = "bookmarks"
 const driver = "sqlite3"
 
-func BmInsertToTable(bookmark *base.RecordableNode, db squirrel.DBProxyBeginner) error {
+func InsertBMToTable(bookmark *base.RecordableNode, db squirrel.DBProxyBeginner) error {
 	bookmark.Recorder = structable.New(db, driver).Bind(
 		BookmarkTable, bookmark,
 	)
@@ -91,7 +91,7 @@ func BackupNodeRoots(roots []*base.BookmarkNodeBase) *sq.DBProxyBeginner {
 	for _, root := range roots {
 		for _, node := range base.GetNodesBFS(root) {
 			rec := node.ToRecordable()
-			if err := BmInsertToTable(rec, cache); err != nil {
+			if err := InsertBMToTable(rec, cache); err != nil {
 				fmt.Println(err.Error())
 			}
 		}
