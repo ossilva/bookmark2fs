@@ -1,7 +1,7 @@
 package htmlconv
 
 import (
-	"fmt"
+	"errors"
 	"io"
 	"os"
 	"path"
@@ -70,111 +70,125 @@ func standardizeHTML(htmlString string) *strings.Reader {
 	return htmlReader
 }
 
-//ParseNetscapeHTML parses HTML to abstract trees
-func ParseNetscapeHTML(reader io.Reader) []*base.BookmarkNodeBase {
-	doc, err := html.Parse(reader)
-	check(err)
-
-	stack := []*base.BookmarkNodeBase{}
-
-	var body *html.Node
+func locateGroundNode(doc *html.Node) (*html.Node, error) {
 	for d := doc.FirstChild; d != nil; d = d.NextSibling {
 		if d.Type == html.ElementNode && (d.Data == "html" || d.Data == "body") {
 			d = d.FirstChild
 		}
 		if d.Type == html.ElementNode && d.Data == "dl" {
-			body = d
-			break
+			return d, nil
 		}
 	}
+	return nil, errors.New("Could not find bottom layer of bookmark html.")
+}
 
+func collectRoots(groundNode *html.Node) []*base.BookmarkNodeBase {
 	rootNodes := []*base.BookmarkNodeBase{}
-	for c := body.FirstChild; c != nil; c = c.NextSibling {
+	for c := groundNode.FirstChild; c != nil; c = c.NextSibling {
 		if c.Data == "dt" {
 			rootNode := &base.BookmarkNodeBase{}
 			rootNodes = append(rootNodes, rootNode)
 
 			rootNode.UUID = uuid.New()
 			rootNode.Baggage = c
-
-			stack = append(stack, rootNode)
 		}
 	}
+	return rootNodes
+}
+
+func processDir(
+	stack []*base.BookmarkNodeBase,
+	dirNode *html.Node,
+	bmNode *base.BookmarkNodeBase,
+) []*base.BookmarkNodeBase {
+	// dirCn = dirCn.FirstChild // children follow <p> tag
+	newStack := stack
+	for c := dirNode.FirstChild; c != nil; c = c.NextSibling {
+		if c.Data == "p" {
+			continue
+		}
+		if c.Data == "dt" {
+			dirNode := &base.BookmarkNodeBase{}
+			dirNode.UUID = uuid.New()
+			dirNode.Baggage = c
+			dirNode.Parent = bmNode
+			dirNode.Path = bmNode.Path
+			bmNode.Children = append(bmNode.Children, dirNode)
+			newStack = append(newStack, dirNode)
+		}
+	}
+	return newStack
+}
+
+func annotateDirNode(dirNode *html.Node, bmNode *base.BookmarkNodeBase) {
+	bmNode.Type = "folder"
+	var err error
+	for _, a := range dirNode.Attr {
+		if a.Key == "add_date" {
+			bmNode.DateCreated, err = strconv.ParseInt(a.Val, 10, 64)
+		} else if a.Key == "last_modified" {
+			bmNode.DateModified, err = strconv.ParseInt(a.Val, 10, 64)
+		} else if a.Key == "personal_toobar_folder" && a.Val == "true" {
+			bmNode.BookmarkBar = true
+		}
+		check(err)
+	}
+}
+
+func annotateUrlNode(dirNode *html.Node, bmNode *base.BookmarkNodeBase) {
+	bmNode.Type = "url"
+	var err error
+	for _, a := range dirNode.Attr {
+		if a.Key == "add_date" {
+			bmNode.DateCreated, err = strconv.ParseInt(a.Val, 10, 64)
+			check(err)
+		} else if a.Key == "href" {
+			bmNode.URL = a.Val
+		}
+	}
+}
+
+//ParseNetscapeHTML parses HTML to abstract trees
+func ParseNetscapeHTML(reader io.Reader) []*base.BookmarkNodeBase {
+	doc, err := html.Parse(reader)
+	check(err)
+
+	groundNode, err := locateGroundNode(doc)
+	check(err)
+
+	rootNodes := collectRoots(groundNode)
+	stack := append([]*base.BookmarkNodeBase{}, rootNodes...)
 
 	for len(stack) > 0 { //until stack is empty,
-		n := stack[len(stack)-1]
+		bmNode := stack[len(stack)-1]
 		stack = stack[:len(stack)-1]
 
-		bag := n.Baggage
+		bag := bmNode.Baggage
 
 		if bag.Type == html.ElementNode &&
 			bag.Data == "dt" &&
 			bag.FirstChild != nil {
 			for dirCn := bag.FirstChild; dirCn != nil; dirCn = dirCn.NextSibling {
 				if dirCn.Data == "dl" { //type: folder
-					// dirCn = dirCn.FirstChild // children follow <p> tag
-					for c := dirCn.FirstChild; c != nil; c = c.NextSibling {
-						if c.Data == "p" {
-							continue
-						}
-						if c.Data == "dt" {
-							node := &base.BookmarkNodeBase{}
-							node.UUID = uuid.New()
-							node.Baggage = c
-							node.Parent = n
-							node.Path = n.Path
-							n.Children = append(n.Children, node)
-							stack = append(stack, node)
-						}
-					}
+					stack = processDir(stack, dirCn, bmNode)
 				} else { // if dirCn.Data == "h3" || dirCn.Data == "a" {
 					switch dirCn.Data {
 					case "h3": //type: folder
-						n.Type = "folder"
-						for _, a := range dirCn.Attr {
-							if a.Key == "add_date" {
-								n.DateCreated, err = strconv.ParseInt(a.Val, 10, 64)
-								check(err)
-								continue
-							}
-							if a.Key == "last_modified" {
-								n.DateModified, err = strconv.ParseInt(a.Val, 10, 64)
-								check(err)
-								continue
-							}
-							if a.Key == "personal_toobar_folder" && a.Val == "true" {
-								n.BookmarkBar = true
-								continue
-							}
-						}
+						annotateDirNode(dirCn, bmNode)
 					case "a": //type: url
-						n.Type = "url"
-						for _, a := range dirCn.Attr {
-							if a.Key == "add_date" {
-								n.DateCreated, err = strconv.ParseInt(a.Val, 10, 64)
-								check(err)
-								continue
-							}
-							if a.Key == "href" {
-								n.URL = a.Val
-								continue
-							}
-						}
+						annotateUrlNode(dirCn, bmNode)
 					default:
 						continue
 					}
 					if dirCn.FirstChild != nil {
-						n.Name = dirCn.FirstChild.Data
+						bmNode.Name = dirCn.FirstChild.Data
 					} else {
-						n.Name = "~UNNAMED"
+						bmNode.Name = "~UNNAMED"
 					}
-					n.Path = path.Join(n.Path, util.StringToFilename(n.Name))
-					if n.DateCreated == 0 {
-						fmt.Println("Error")
-					}
+					bmNode.Path = path.Join(bmNode.Path, util.StringToFilename(bmNode.Name))
 				}
 			}
-			n.Baggage = nil
+			bmNode.Baggage = nil
 		}
 	}
 	return rootNodes

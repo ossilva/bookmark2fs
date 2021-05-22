@@ -86,61 +86,75 @@ func Init(cmd *cobra.Command, args []string) {
 	items := getOptionSlice()
 
 	for {
-		prompt := promptui.Select{
-			Label: fmt.Sprintf(
-				"Select operation [temporary dir: %s]",
-				config.TmpRoot,
-			),
-			Items: items,
-		}
-		_, result, _ := prompt.Run()
-
-		if result == "change root directory" {
-			var tryPath string
-			for {
-				finfo, err := os.Stat(tryPath)
-				if err == nil {
-					if finfo.IsDir() {
-						break
-					}
-				}
-
-				if tryPath != "" {
-					fmt.Println("Error: specify existing directory")
-				}
-
-				prompt := promptui.Prompt{
-					Label: "Specify temporary directory",
-				}
-				tryPath, _ = prompt.Run()
-			}
-			config.TmpRoot = tryPath
-		} else if options[result] == options["populate filesystem tree"] {
-			tmpDirPath, _ = fstree.PopulateTmpDir(bmRoots, tracker, config.TmpRoot)
-			defer os.RemoveAll(tmpDirPath)
-		} else if options[result] == options["export to browser HTML"] {
-			if _, err := os.Stat(tmpDirPath); err == nil {
-				exportNodeRoots = fstree.CollectFSTrees(tmpDirPath, tracker)
-				htmlconv.BuildTreeHTML(exportNodeRoots, config.OutputFile)
-			}
-		} else if options[result] == options["change bookmark store"] {
-			bmFile := promptBookmarkFile()
-			bmRoots = ReadInputFile(bmFile)
-		} else if options[result] == options["show changes"] {
-			// TODO varies according to bookmark array source
-		} else if options[result] == options["create/save sqlite"] {
-			var rootsToSave []*base.BookmarkNodeBase
-			if exportNodeRoots != nil {
-				rootsToSave = exportNodeRoots
-			} else if bmRoots != nil {
-				rootsToSave = bmRoots
-			}
-			db.BackupNodeRoots(rootsToSave)
-		} else if options[result] == options["EXIT"] {
-			return
-		}
+		showMenu(bmRoots, exportNodeRoots, tmpDirPath, config, items, tracker)
 	}
+}
 
+func showMenu(
+	bmRoots []*base.BookmarkNodeBase,
+	exportNodeRoots []*base.BookmarkNodeBase,
+	tmpDirPath string,
+	config *configuration.Bm2fsConfig,
+	items []optionItem,
+	tracker *util.BookmarkTracker,
+) {
+	prompt := promptui.Select{
+		Label: fmt.Sprintf(
+			"Select operation [temporary dir: %s]",
+			config.TmpRoot,
+		),
+		Items: items,
+	}
+	_, result, _ := prompt.Run()
+
+	if result == "change root directory" {
+		var tryPath string
+		for {
+			finfo, err := os.Stat(tryPath)
+			if err == nil {
+				if finfo.IsDir() {
+					break
+				}
+			}
+
+			if tryPath != "" {
+				fmt.Println("Error: specify existing directory")
+			}
+
+			prompt := promptui.Prompt{
+				Label: "Specify temporary directory",
+			}
+			tryPath, _ = prompt.Run()
+		}
+		config.TmpRoot = tryPath
+	} else if options[result] == options["populate filesystem tree"] {
+		tmpDirPath, _ = fstree.PopulateTmpDir(bmRoots, tracker, config.TmpRoot)
+		defer os.RemoveAll(tmpDirPath)
+	} else if options[result] == options["export to browser HTML"] {
+		if _, err := os.Stat(tmpDirPath); err == nil {
+			exportNodeRoots = fstree.CollectFSTrees(tmpDirPath, tracker)
+			htmlconv.BuildTreeHTML(exportNodeRoots, config.OutputFile)
+		}
+	} else if options[result] == options["change bookmark store"] {
+		bmFile := promptBookmarkFile()
+		bmRoots = ReadInputFile(bmFile)
+	} else if options[result] == options["show changes"] {
+		// TODO varies according to bookmark array source
+	} else if options[result] == options["create/save sqlite"] {
+		saveSQLite(exportNodeRoots, bmRoots)
+	} else if options[result] == options["EXIT"] {
+		return
+	}
+}
+
+func saveSQLite(exportNodeRoots []*base.BookmarkNodeBase, bmRoots []*base.BookmarkNodeBase) {
+	var rootsToSave []*base.BookmarkNodeBase
+	if exportNodeRoots != nil {
+		rootsToSave = exportNodeRoots
+	} else if bmRoots != nil {
+		rootsToSave = bmRoots
+	}
+	db.BackupNodeRoots(rootsToSave)
 }
 
 func promptBookmarkFile() string {
