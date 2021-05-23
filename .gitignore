@@ -1,5 +1,4 @@
 .vscode/
-pkg/
 
 test.goenum.go
 bookmark2fs
