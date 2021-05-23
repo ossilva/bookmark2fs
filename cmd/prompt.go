@@ -5,12 +5,11 @@ import (
 	"os"
 	"path"
 	"runtime"
-	"time"
 
 	"github.com/spf13/cobra"
 
 	"github.com/manifoldco/promptui"
-	"github.com/ossilva/bookmark2fs/pkg/configuration"
+	config "github.com/ossilva/bookmark2fs/pkg/configuration"
 	"github.com/ossilva/bookmark2fs/pkg/conversion/base"
 	"github.com/ossilva/bookmark2fs/pkg/conversion/htmlconv"
 	"github.com/ossilva/bookmark2fs/pkg/db"
@@ -18,12 +17,14 @@ import (
 	"github.com/ossilva/bookmark2fs/pkg/util"
 )
 
+const MaxPromptArgs = 1
+
 var cmdPrompt = &cobra.Command{
 	Use:   "prompt",
 	Short: "Start in prompt mode",
-	Long: `print is for printing anything back to the screen.
-For many years people have printed back to the screen.`,
-	Run: Init,
+	Long:  `Access bookmark2fs functionality through user-friendly menus.`,
+	Args:  cobra.RangeArgs(0, MaxPromptArgs),
+	Run:   Init,
 }
 
 type optionItem string
@@ -56,12 +57,35 @@ func getOptionSlice() []optionItem {
 	return items
 }
 
+func changeFSRootDir(config *config.Bm2fsConfig) *config.Bm2fsConfig {
+	var tryPath string
+	for {
+		finfo, err := os.Stat(tryPath)
+		if err == nil {
+			if finfo.IsDir() {
+				break
+			}
+		}
+
+		if tryPath != "" {
+			fmt.Println("Error: specify existing directory")
+		}
+
+		prompt := promptui.Prompt{
+			Label: "Specify temporary directory",
+		}
+		tryPath, _ = prompt.Run()
+	}
+	config.TmpRoot = tryPath
+	return config
+}
+
 //Init prompts user for input
 func Init(cmd *cobra.Command, args []string) {
 	fmt.Println("******************************************")
 
-	inFiles := generateSourceList(args)
-	var config *configuration.Bm2fsConfig = makeConfig()
+	inFiles := acquireBrowserBMFiles(args)
+	var config *config.Bm2fsConfig = makeConfig()
 
 	bmStore := inFiles[0]
 	var bmRoots []*base.BookmarkNodeBase
@@ -94,7 +118,7 @@ func showMenu(
 	bmRoots []*base.BookmarkNodeBase,
 	exportNodeRoots []*base.BookmarkNodeBase,
 	tmpDirPath string,
-	config *configuration.Bm2fsConfig,
+	config *config.Bm2fsConfig,
 	items []optionItem,
 	tracker *util.BookmarkTracker,
 ) {
@@ -107,26 +131,8 @@ func showMenu(
 	}
 	_, result, _ := prompt.Run()
 
-	if result == "change root directory" {
-		var tryPath string
-		for {
-			finfo, err := os.Stat(tryPath)
-			if err == nil {
-				if finfo.IsDir() {
-					break
-				}
-			}
-
-			if tryPath != "" {
-				fmt.Println("Error: specify existing directory")
-			}
-
-			prompt := promptui.Prompt{
-				Label: "Specify temporary directory",
-			}
-			tryPath, _ = prompt.Run()
-		}
-		config.TmpRoot = tryPath
+	if options[result] == options["change root directory"] {
+		config = changeFSRootDir(config)
 	} else if options[result] == options["populate filesystem tree"] {
 		tmpDirPath, _ = fstree.PopulateTmpDir(bmRoots, tracker, config.TmpRoot)
 		defer os.RemoveAll(tmpDirPath)
@@ -178,61 +184,38 @@ func promptBookmarkFile() string {
 	return result
 }
 
-func getChromeJSONFile() string {
-	var chromeBM, chromiumBM, file string
-	switch runtime.GOOS {
+func solveDefaultChromePaths(goOs string, userConfigDir string) (string, string) {
+	var chromeBmJSON, chromiumBmJSON string
+	switch goOs {
 	case "windows":
-		appdata, err := os.UserConfigDir()
-		check(err)
-		chromeBM = path.Join(appdata, "Local", "Google", "Chrome", "User Data", "Default", "Bookmarks")
-		chromiumBM = path.Join(appdata, "Local", "Chromium", "User Data", "Default", "Bookmarks")
+		chromeBmJSON = path.Join(userConfigDir, "Local", "Google", "Chrome", "User Data", "Default", "Bookmarks")
+		chromiumBmJSON = path.Join(userConfigDir, "Local", "Chromium", "User Data", "Default", "Bookmarks")
 	default:
-		configDir, err := os.UserConfigDir()
-		check(err)
-		chromeBM = path.Join(configDir, "Chromium", "Default", "Bookmarks")
-		chromiumBM = path.Join(configDir, "google-chrome", "Default", "Bookmarks")
+		chromeBmJSON = path.Join(userConfigDir, "Chromium", "Default", "Bookmarks")
+		chromiumBmJSON = path.Join(userConfigDir, "google-chrome", "Default", "Bookmarks")
 	}
-	fileAttempts := []string{chromeBM, chromiumBM}
+	return chromeBmJSON, chromiumBmJSON
+}
+
+func getChromeJSONFile() []string {
+	userConfigDir, err := os.UserConfigDir()
+	check(err)
+	chromeBmJSON, chromiumBmJSON := solveDefaultChromePaths(runtime.GOOS, userConfigDir)
+	fileAttempts := []string{chromeBmJSON, chromiumBmJSON}
 	for _, file := range fileAttempts {
 		_, err := os.Stat(file)
 		if err == nil {
-			break
+			return []string{file}
 		}
 	}
-	return file
+	return []string{}
 }
 
-func parseArgs(args []string) string {
-	now := time.Now()
-	timeString := now.Format("02_01_06")
-	defaultFileName := fmt.Sprintf("BM2FS_bookmarks_%s.html",
-		timeString,
-	)
-
-	candidatesInFile := []string{
-		inFile,
-		args[len(args)],
-		defaultFileName,
-	}
-
-	var outname string
-	for _, f := range candidatesInFile {
-		if !fileExists(f) {
-			outname = f
-			break
-		}
-	}
-
-	return outname
-}
-
-func generateSourceList(args []string) []string {
+func acquireBrowserBMFiles(args []string) []string {
 	sourcePaths := []string{}
-	if len(args) > 0 {
-		if args[0] != "" {
-			sourcePaths = append(sourcePaths, args[len(args)-1])
-		}
+	if len(args) == MaxPromptArgs {
+		sourcePaths = append(sourcePaths, args[0])
 	}
-	sourcePaths = append(sourcePaths, getChromeJSONFile())
+	sourcePaths = append(sourcePaths, getChromeJSONFile()...)
 	return sourcePaths
 }

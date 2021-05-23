@@ -26,7 +26,8 @@ import (
 func makeConfig() *configuration.Bm2fsConfig {
 
 	timeString := time.Now().Format("02_01_06")
-	defaultFileName := fmt.Sprintf("BM2FS_bookmarks_%s.html",
+	defaultFileName := fmt.Sprintf(
+		"BM2FS_bookmarks_%s.html",
 		timeString,
 	)
 	wd, err := os.Getwd()
@@ -121,12 +122,14 @@ func readUserInput() {
 	}
 }
 
-// Execute executes the root command.
+// Execute the root command.
 func Execute() error {
 	if len(os.Args) == 1 {
 		os.Args = append(os.Args, "prompt")
 	}
-
+	if err := rootCmd.Execute(); err != nil {
+		os.Exit(23)
+	}
 	return rootCmd.Execute()
 }
 
@@ -155,7 +158,7 @@ func SetupCloseHandler(config *configuration.Bm2fsConfig) {
 		os.RemoveAll(config.TmpRoot)
 	}
 	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	signal.Notify(c, os.Interrupt, syscall.SIGINT)
 	go func() {
 		<-c
 		fmt.Println("\r- Cleared temporary directory")
